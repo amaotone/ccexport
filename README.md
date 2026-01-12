@@ -109,11 +109,6 @@ ccexport export --all
 - [Claude Code Hooks Integration](docs/hooks.md)
 - [Detailed Specification](docs/spec.md)
 
-## References
-
-- [Original Article: Building a system to automatically record Claude Code conversations to Obsidian](https://zenn.dev/pepabo/articles/ffb79b5279f6ee)
-- [Claude Code Hooks Documentation](https://docs.anthropic.com/en/docs/claude-code/hooks)
-
 ## License
 
 MIT
