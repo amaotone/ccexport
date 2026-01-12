@@ -12,6 +12,10 @@ export const claudeMemFilter: FilterRule = {
     if (text.includes("<observation>")) {
       return true;
     }
+    // Filter progress summary requests (claude-mem protocol)
+    if (text.includes("you are a memory agent")) {
+      return true;
+    }
     return false;
   },
 };
