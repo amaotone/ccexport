@@ -221,6 +221,23 @@ describe("session parser", () => {
 
       expect(messages.length).toBe(2);
     });
+
+    it("filters out messages with empty text", async () => {
+      const sessionFile = join(tempDir, "session.jsonl");
+      const content = `{"type":"user","timestamp":"2026-01-12T01:30:00Z","message":{"content":"question"}}
+{"type":"assistant","timestamp":"2026-01-12T01:30:05Z","message":{"content":[{"type":"thinking","thinking":"internal thought"}]}}
+{"type":"assistant","timestamp":"2026-01-12T01:30:06Z","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"ls"}}]}}
+{"type":"user","timestamp":"2026-01-12T01:30:07Z","message":{"content":[{"type":"tool_result","content":"file.txt"}]}}
+{"type":"assistant","timestamp":"2026-01-12T01:30:08Z","message":{"content":[{"type":"text","text":"answer"}]}}
+`;
+      await writeFile(sessionFile, content);
+
+      const messages = await parseSessionFile(sessionFile);
+
+      expect(messages.length).toBe(2);
+      expect(messages[0].text).toBe("question");
+      expect(messages[1].text).toBe("answer");
+    });
   });
 
   describe("getClaudeProjectsDir", () => {

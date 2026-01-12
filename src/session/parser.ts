@@ -153,6 +153,10 @@ export async function parseSessionFile(path: string): Promise<Message[]> {
       continue;
     }
 
+    if (msg.text.trim() === "") {
+      continue;
+    }
+
     if (shouldFilter(msg.text)) {
       continue;
     }
