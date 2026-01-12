@@ -35,18 +35,6 @@ filename_format = "yyyy-MM-dd"
 | `yyyy_MM_dd` | 2026_01_12 |
 | `yyyyMMdd` | 20260112 |
 
-### git_commit
-
-Whether to automatically run git commit after export.
-
-```toml
-git_commit = false
-```
-
-**Default**: `false`
-
-When enabled, if the output directory is a Git repository, changes are automatically committed.
-
 ### project_mode
 
 Specifies how to output per project.
@@ -88,7 +76,6 @@ Creates subdirectories for each project.
 ```toml
 output_dir = "~/obsidian/claude"
 filename_format = "yyyy-MM-dd"
-git_commit = false
 project_mode = "merge"
 ```
 
@@ -97,17 +84,7 @@ project_mode = "merge"
 ```toml
 output_dir = "~/Documents/claude-logs"
 filename_format = "yyyy-MM-dd"
-git_commit = false
 project_mode = "separate"
-```
-
-### Git Managed
-
-```toml
-output_dir = "~/claude-history"
-filename_format = "yyyy-MM-dd"
-git_commit = true
-project_mode = "merge"
 ```
 
 ## Changing Configuration via CLI
@@ -118,7 +95,6 @@ ccexport config show
 
 # Change individual settings
 ccexport config set output_dir ~/Documents/claude-logs
-ccexport config set git_commit true
 ccexport config set project_mode separate
 
 # Open in editor

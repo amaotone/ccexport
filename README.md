@@ -48,9 +48,6 @@ output_dir = "~/obsidian/claude"
 # Filename format (date-fns format)
 filename_format = "yyyy-MM-dd"
 
-# Run git commit on changes
-git_commit = false
-
 # Project handling: "merge" or "separate"
 project_mode = "merge"
 ```
@@ -82,33 +79,28 @@ Flags:
 ccexport
 
 # Export specific date
-ccexport export -d 2026-01-10
+ccexport export -d 2025-01-10
 
 # Export all dates
 ccexport export --all
-
-# Dry-run (preview without writing files)
-ccexport export --dry-run
 ```
 
 ## Output Example
 
 ```markdown
-# 2026-01-12 Claude Conversation Log
-
 ## 10:30 projectA
 
-**User**: How do I watch files in TypeScript?
+**User:** How do I watch files in TypeScript?
 
-**Claude**: You can use Node.js's `fs.watch` or the `chokidar` library...
+**Claude:** You can use Node.js's `fs.watch` or the `chokidar` library...
 
 ---
 
 ## 14:15 projectB
 
-**User**: Explain Rust lifetimes
+**User:** Explain Rust lifetimes
 
-**Claude**: Lifetimes specify how long references are valid...
+**Claude:** Lifetimes specify how long references are valid...
 ```
 
 ## Documentation
