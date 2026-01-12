@@ -6,7 +6,7 @@ function formatQuestions(questions: AskUserQuestion[]): string {
       const optionsText = q.options
         .map((opt) => `- ${opt.label}: ${opt.description}`)
         .join("\n");
-      return `[Question: ${q.header}]\n${q.question}\n${optionsText}`;
+      return `**Question: ${q.header}**\n${q.question}\n${optionsText}`;
     })
     .join("\n\n");
 }

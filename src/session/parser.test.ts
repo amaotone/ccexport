@@ -74,7 +74,7 @@ describe("session parser", () => {
       const msg = parseMessage(line);
 
       expect(msg?.text).toContain("Let me ask:");
-      expect(msg?.text).toContain("[Question: Option]");
+      expect(msg?.text).toContain("**Question: Option**");
       expect(msg?.text).toContain("Which option do you prefer?");
       expect(msg?.text).toContain("- Option A: First choice");
       expect(msg?.text).toContain("- Option B: Second choice");
