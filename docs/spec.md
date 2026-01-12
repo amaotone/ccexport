@@ -8,7 +8,7 @@
 ~/.claude/projects/{project-hash}/{session-id}.jsonl
 ```
 
-- `project-hash`: Escaped project path (e.g., `-Users-amane-work-myapp`)
+- `project-hash`: Escaped project path (e.g., `-path-to-work-myapp`)
 - `session-id`: UUID-based session identifier
 
 ### JSONL Format
@@ -97,7 +97,7 @@ ccexport export -d 2026-01-10
 ccexport export -o ~/Desktop
 
 # Specific project only
-ccexport export -p /Users/amane/work/myproject
+ccexport export -p ~/work/myproject
 
 # Export all dates
 ccexport export --all
@@ -168,7 +168,7 @@ Commands:
 ```bash
 # Show current configuration
 $ ccexport config show
-output_dir = "/Users/amane/obsidian/claude"
+output_dir = "~/obsidian/claude"
 filename_format = "yyyy-MM-dd"
 git_commit = false
 project_mode = "merge"
@@ -182,7 +182,7 @@ $ ccexport config set output_dir ~/Documents/claude-logs
 
 # Show config file path
 $ ccexport config path
-/Users/amane/.config/ccexport/config.toml
+~/.config/ccexport/config.toml
 ```
 
 ## Future Extension Ideas (Out of Scope)
