@@ -24,20 +24,20 @@ const program = new Command();
 
 program
   .name("ccexport")
-  .description("Claude Code会話履歴エクスポーター")
+  .description("Claude Code conversation history exporter")
   .version(VERSION)
-  .option("-c, --config <path>", "設定ファイルのパス")
-  .option("-v, --verbose", "詳細ログを出力");
+  .option("-c, --config <path>", "Configuration file path")
+  .option("-v, --verbose", "Output detailed logs");
 
 // export command (default)
 program
   .command("export", { isDefault: true })
-  .description("会話履歴をエクスポート")
-  .option("-o, --output <dir>", "出力先ディレクトリ")
-  .option("-d, --date <date>", "対象日付 (YYYY-MM-DD)")
-  .option("-p, --project <path>", "対象プロジェクトのパス")
-  .option("--all", "全日付をエクスポート")
-  .option("--dry-run", "実行せずに出力内容を表示")
+  .description("Export conversation history")
+  .option("-o, --output <dir>", "Output directory")
+  .option("-d, --date <date>", "Target date (YYYY-MM-DD)")
+  .option("-p, --project <path>", "Target project path")
+  .option("--all", "Export all dates")
+  .option("--dry-run", "Display output without writing files")
   .action(async (options) => {
     try {
       const configPath = program.opts().config || defaultConfigPath();
@@ -53,14 +53,14 @@ program
       });
 
       if (options.dryRun) {
-        console.log(markdown || "(エクスポートするセッションがありません)");
+        console.log(markdown || "(No sessions to export)");
       } else if (markdown) {
-        console.log(chalk.green("✅ エクスポートしました"));
+        console.log(chalk.green("✅ Export completed"));
       } else {
-        console.log(chalk.yellow("エクスポートするセッションがありません"));
+        console.log(chalk.yellow("No sessions to export"));
       }
     } catch (error) {
-      console.error(chalk.red(`エラー: ${(error as Error).message}`));
+      console.error(chalk.red(`Error: ${(error as Error).message}`));
       process.exit(1);
     }
   });
@@ -68,8 +68,8 @@ program
 // init command
 program
   .command("init")
-  .description("設定ファイルを対話的に作成")
-  .option("--force", "既存の設定ファイルを上書き")
+  .description("Create configuration file interactively")
+  .option("--force", "Overwrite existing config file")
   .action(async (options) => {
     const configPath = program.opts().config || defaultConfigPath();
 
@@ -78,7 +78,7 @@ program
         await loadConfig(configPath);
         console.log(
           chalk.yellow(
-            `設定ファイルは既に存在します: ${configPath}\n--force で上書きできます`
+            `Config file already exists: ${configPath}\nUse --force to overwrite`
           )
         );
         return;
@@ -95,14 +95,14 @@ program
       });
 
     try {
-      const outputDir = await question("出力先ディレクトリ: ");
+      const outputDir = await question("Output directory: ");
       const filenameFormat =
-        (await question("ファイル名フォーマット [yyyy-MM-dd]: ")) ||
+        (await question("Filename format [yyyy-MM-dd]: ")) ||
         "yyyy-MM-dd";
-      const gitCommitStr = await question("Git自動コミット (y/N): ");
+      const gitCommitStr = await question("Git auto-commit (y/N): ");
       const gitCommit = gitCommitStr.toLowerCase() === "y";
       const projectModeStr = await question(
-        "プロジェクトモード (merge/separate) [merge]: "
+        "Project mode (merge/separate) [merge]: "
       );
       const projectMode =
         projectModeStr === "separate" ? "separate" : "merge";
@@ -116,20 +116,20 @@ program
 
       await saveConfig(configPath, config);
 
-      console.log(chalk.green(`\n✅ 設定ファイルを作成しました: ${configPath}`));
-      console.log("\n次のステップ:");
-      console.log("  ccexport hook install   # Claude Codeフックを設定");
+      console.log(chalk.green(`\n✅ Created config file: ${configPath}`));
+      console.log("\nNext steps:");
+      console.log("  ccexport hook install   # Configure Claude Code hook");
     } finally {
       rl.close();
     }
   });
 
 // hook command
-const hookCommand = program.command("hook").description("Claude Codeフックを管理");
+const hookCommand = program.command("hook").description("Manage Claude Code hooks");
 
 hookCommand
   .command("install")
-  .description("フックをインストール")
+  .description("Install hook")
   .action(async () => {
     try {
       const settingsPath = defaultSettingsPath();
@@ -137,8 +137,8 @@ hookCommand
 
       await installHook(settingsPath, ccexportPath);
 
-      console.log(chalk.green("✅ Claude Codeフックを設定しました"));
-      console.log(`\n${settingsPath} に以下が追加されました:`);
+      console.log(chalk.green("✅ Claude Code hook configured"));
+      console.log(`\nThe following was added to ${settingsPath}:`);
       console.log(
         JSON.stringify(
           {
@@ -161,53 +161,53 @@ hookCommand
         )
       );
     } catch (error) {
-      console.error(chalk.red(`エラー: ${(error as Error).message}`));
+      console.error(chalk.red(`Error: ${(error as Error).message}`));
       process.exit(1);
     }
   });
 
 hookCommand
   .command("uninstall")
-  .description("フックをアンインストール")
+  .description("Uninstall hook")
   .action(async () => {
     try {
       const settingsPath = defaultSettingsPath();
       await uninstallHook(settingsPath);
-      console.log(chalk.green("✅ フックを削除しました"));
+      console.log(chalk.green("✅ Hook removed"));
     } catch (error) {
-      console.error(chalk.red(`エラー: ${(error as Error).message}`));
+      console.error(chalk.red(`Error: ${(error as Error).message}`));
       process.exit(1);
     }
   });
 
 hookCommand
   .command("status")
-  .description("フックの状態を表示")
+  .description("Show hook status")
   .action(async () => {
     try {
       const settingsPath = defaultSettingsPath();
       const status = await getHookStatus(settingsPath);
 
       if (status.installed) {
-        console.log(chalk.green("✅ フックはインストール済みです"));
-        console.log(`   トリガー: ${status.trigger}`);
-        console.log(`   コマンド: ${status.command}`);
+        console.log(chalk.green("✅ Hook is installed"));
+        console.log(`   Trigger: ${status.trigger}`);
+        console.log(`   Command: ${status.command}`);
       } else {
-        console.log(chalk.yellow("フックはインストールされていません"));
-        console.log("  ccexport hook install でインストールできます");
+        console.log(chalk.yellow("Hook is not installed"));
+        console.log("  Run: ccexport hook install");
       }
     } catch (error) {
-      console.error(chalk.red(`エラー: ${(error as Error).message}`));
+      console.error(chalk.red(`Error: ${(error as Error).message}`));
       process.exit(1);
     }
   });
 
 // config command
-const configCommand = program.command("config").description("設定の表示・編集");
+const configCommand = program.command("config").description("View/edit configuration");
 
 configCommand
   .command("show")
-  .description("現在の設定を表示")
+  .description("Show current configuration")
   .action(async () => {
     try {
       const configPath = program.opts().config || defaultConfigPath();
@@ -218,14 +218,14 @@ configCommand
       console.log(`git_commit = ${config.gitCommit}`);
       console.log(`project_mode = "${config.projectMode}"`);
     } catch (error) {
-      console.error(chalk.red(`エラー: ${(error as Error).message}`));
+      console.error(chalk.red(`Error: ${(error as Error).message}`));
       process.exit(1);
     }
   });
 
 configCommand
   .command("path")
-  .description("設定ファイルのパスを表示")
+  .description("Show config file path")
   .action(() => {
     const configPath = program.opts().config || defaultConfigPath();
     console.log(configPath);
@@ -233,7 +233,7 @@ configCommand
 
 configCommand
   .command("set <key> <value>")
-  .description("設定値を変更")
+  .description("Change configuration value")
   .action(async (key: string, value: string) => {
     try {
       const configPath = program.opts().config || defaultConfigPath();
@@ -251,27 +251,27 @@ configCommand
           break;
         case "project_mode":
           if (value !== "merge" && value !== "separate") {
-            console.error(chalk.red("project_mode は merge または separate を指定してください"));
+            console.error(chalk.red("project_mode must be 'merge' or 'separate'"));
             process.exit(1);
           }
           config.projectMode = value;
           break;
         default:
-          console.error(chalk.red(`不明な設定キー: ${key}`));
+          console.error(chalk.red(`Unknown config key: ${key}`));
           process.exit(1);
       }
 
       await saveConfig(configPath, config);
-      console.log(chalk.green(`✅ ${key} を更新しました`));
+      console.log(chalk.green(`✅ Updated ${key}`));
     } catch (error) {
-      console.error(chalk.red(`エラー: ${(error as Error).message}`));
+      console.error(chalk.red(`Error: ${(error as Error).message}`));
       process.exit(1);
     }
   });
 
 configCommand
   .command("edit")
-  .description("エディタで設定ファイルを開く")
+  .description("Open config file in editor")
   .action(async () => {
     const configPath = program.opts().config || defaultConfigPath();
     const editor = process.env.EDITOR || "vi";

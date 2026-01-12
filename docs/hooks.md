@@ -1,18 +1,18 @@
-# Claude Code Hooks連携
+# Claude Code Hooks Integration
 
-## 概要
+## Overview
 
-ccexportはClaude Codeのhooks機能と連携し、セッション終了時に自動でエクスポートを実行できます。
+ccexport integrates with Claude Code's hooks feature to automatically execute exports when sessions end.
 
-## フックの仕組み
+## How Hooks Work
 
-Claude Codeは `~/.claude/settings.json` でフックを設定できます。
+Claude Code configures hooks in `~/.claude/settings.json`.
 
-参考: https://docs.anthropic.com/en/docs/claude-code/hooks
+Reference: https://docs.anthropic.com/en/docs/claude-code/hooks
 
-## 使用するフック
+## Hook Used
 
-**PostToolUse** フックで **Stop** ツール（セッション終了）をトリガーにします:
+Uses **PostToolUse** hook with **Stop** tool (session end) as trigger:
 
 ```json
 {
@@ -32,15 +32,15 @@ Claude Codeは `~/.claude/settings.json` でフックを設定できます。
 }
 ```
 
-## フックの管理
+## Hook Management
 
-### インストール
+### Install
 
 ```bash
 $ ccexport hook install
-✅ Claude Codeフックを設定しました
+✅ Claude Code hook configured
 
-~/.claude/settings.json に以下が追加されました:
+The following was added to ~/.claude/settings.json:
 {
   "hooks": {
     "PostToolUse": [
@@ -58,64 +58,64 @@ $ ccexport hook install
 }
 ```
 
-### 状態確認
+### Check Status
 
 ```bash
 $ ccexport hook status
-✅ フックはインストール済みです
-   トリガー: PostToolUse (Stop)
-   コマンド: /usr/local/bin/ccexport export
+✅ Hook is installed
+   Trigger: PostToolUse (Stop)
+   Command: /usr/local/bin/ccexport export
 ```
 
-### アンインストール
+### Uninstall
 
 ```bash
 $ ccexport hook uninstall
-✅ フックを削除しました
+✅ Hook removed
 ```
 
-## フック実行時の環境変数
+## Environment Variables During Hook Execution
 
-Claude Codeからフックが呼ばれる際、以下の環境変数が設定されます:
+The following environment variables are set when Claude Code calls the hook:
 
-| 環境変数 | 説明 |
-|---------|------|
-| `CLAUDE_WORKING_DIRECTORY` | プロジェクトのパス |
+| Environment Variable | Description |
+|---------------------|-------------|
+| `CLAUDE_WORKING_DIRECTORY` | Project path |
 
-## 手動実行
+## Manual Execution
 
-フックを設定せずに手動でエクスポートすることも可能です:
+You can also export manually without configuring hooks:
 
 ```bash
-# 今日の会話をエクスポート
+# Export today's conversations
 ccexport export
 
-# 特定の日付をエクスポート
+# Export specific date
 ccexport export -d 2026-01-10
 
-# 全日付をエクスポート
+# Export all dates
 ccexport export --all
 ```
 
-## トラブルシューティング
+## Troubleshooting
 
-### フックが動作しない場合
+### Hook Not Working
 
-1. ccexportのパスを確認:
+1. Check ccexport path:
    ```bash
    which ccexport
    ```
 
-2. settings.jsonの内容を確認:
+2. Check settings.json contents:
    ```bash
    cat ~/.claude/settings.json
    ```
 
-3. 手動でコマンドを実行してエラーを確認:
+3. Run command manually to check for errors:
    ```bash
    ccexport export -v
    ```
 
-### 既存のフックとの競合
+### Conflicts with Existing Hooks
 
-既に他のフックが設定されている場合、`ccexport hook install`は既存の設定を保持しつつccexportのフックを追加します。
+If other hooks are already configured, `ccexport hook install` preserves existing settings while adding the ccexport hook.

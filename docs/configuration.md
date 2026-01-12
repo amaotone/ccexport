@@ -1,16 +1,16 @@
-# 設定リファレンス
+# Configuration Reference
 
-## 設定ファイルの場所
+## Configuration File Location
 
 ```
 ~/.config/ccexport/config.toml
 ```
 
-## 設定項目
+## Configuration Options
 
-### output_dir（必須）
+### output_dir (Required)
 
-出力先ディレクトリのパス。`~`はホームディレクトリに展開されます。
+Path to the output directory. `~` is expanded to home directory.
 
 ```toml
 output_dir = "~/obsidian/claude"
@@ -18,18 +18,18 @@ output_dir = "~/obsidian/claude"
 
 ### filename_format
 
-ファイル名のフォーマット。date-fns形式で指定します。
+Filename format. Specify in date-fns format.
 
 ```toml
 filename_format = "yyyy-MM-dd"
 ```
 
-**デフォルト**: `"yyyy-MM-dd"`
+**Default**: `"yyyy-MM-dd"`
 
-#### date-fns形式について
+#### date-fns Format
 
-| フォーマット | 出力例 |
-|-------------|--------|
+| Format | Output Example |
+|--------|----------------|
 | `yyyy-MM-dd` | 2026-01-12 |
 | `yyyy-MM-dd-EEE` | 2026-01-12-Sun |
 | `yyyy_MM_dd` | 2026_01_12 |
@@ -37,29 +37,29 @@ filename_format = "yyyy-MM-dd"
 
 ### git_commit
 
-エクスポート後に自動でgit commitを実行するかどうか。
+Whether to automatically run git commit after export.
 
 ```toml
 git_commit = false
 ```
 
-**デフォルト**: `false`
+**Default**: `false`
 
-有効にすると、出力先ディレクトリがGitリポジトリの場合、変更を自動コミットします。
+When enabled, if the output directory is a Git repository, changes are automatically committed.
 
 ### project_mode
 
-プロジェクトごとの出力方法を指定します。
+Specifies how to output per project.
 
 ```toml
 project_mode = "merge"
 ```
 
-**デフォルト**: `"merge"`
+**Default**: `"merge"`
 
-#### merge モード
+#### merge Mode
 
-全プロジェクトを1つのファイルにまとめます。
+Combines all projects into a single file.
 
 ```
 ~/obsidian/claude/
@@ -68,9 +68,9 @@ project_mode = "merge"
 └── 2026-01-12.md
 ```
 
-#### separate モード
+#### separate Mode
 
-プロジェクトごとにサブディレクトリを作成します。
+Creates subdirectories for each project.
 
 ```
 ~/obsidian/claude/
@@ -81,9 +81,9 @@ project_mode = "merge"
     └── 2026-01-11.md
 ```
 
-## 設定例
+## Configuration Examples
 
-### Obsidian向け（デフォルト推奨）
+### For Obsidian (Recommended Default)
 
 ```toml
 output_dir = "~/obsidian/claude"
@@ -92,7 +92,7 @@ git_commit = false
 project_mode = "merge"
 ```
 
-### プロジェクト別に整理したい場合
+### Organize by Project
 
 ```toml
 output_dir = "~/Documents/claude-logs"
@@ -101,7 +101,7 @@ git_commit = false
 project_mode = "separate"
 ```
 
-### Git管理したい場合
+### Git Managed
 
 ```toml
 output_dir = "~/claude-history"
@@ -110,20 +110,20 @@ git_commit = true
 project_mode = "merge"
 ```
 
-## CLIでの設定変更
+## Changing Configuration via CLI
 
 ```bash
-# 現在の設定を表示
+# Show current configuration
 ccexport config show
 
-# 個別の設定を変更
+# Change individual settings
 ccexport config set output_dir ~/Documents/claude-logs
 ccexport config set git_commit true
 ccexport config set project_mode separate
 
-# エディタで開く
+# Open in editor
 ccexport config edit
 
-# 設定ファイルのパスを表示
+# Show config file path
 ccexport config path
 ```

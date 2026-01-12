@@ -1,129 +1,129 @@
 # CLAUDE.md
 
-このファイルはClaude Codeがこのリポジトリで作業する際のガイダンスを提供します。
+This file provides guidance for Claude Code when working with this repository.
 
-## プロジェクト概要
+## Project Overview
 
-ccexportはClaude Codeの会話履歴をMarkdownにエクスポートするTypeScript製CLIツールです。
+ccexport is a TypeScript CLI tool that exports Claude Code conversation history to Markdown.
 
-## 開発コマンド
+## Development Commands
 
 ```bash
-# 開発実行
+# Run in development mode
 pnpm dev
 
-# ビルド
+# Build
 pnpm build
 
-# テスト実行
+# Run tests
 pnpm test
 
-# テスト（watchモード）
+# Run tests in watch mode
 pnpm test:watch
 
-# 型チェック
+# Type check
 pnpm lint
 ```
 
-## プロジェクト構成
+## Project Structure
 
 ```
 ccexport/
 ├── src/
-│   ├── cli.ts              # CLIエントリーポイント
-│   ├── index.ts            # ライブラリエントリーポイント
-│   ├── config/             # 設定ファイル読み書き
-│   ├── session/            # JSONLパーサー
-│   ├── export/             # エクスポート処理
-│   └── hook/               # Claude Codeフック管理
-├── docs/                   # ドキュメント
+│   ├── cli.ts              # CLI entry point
+│   ├── index.ts            # Library entry point
+│   ├── config/             # Configuration file handling
+│   ├── session/            # JSONL parser
+│   ├── export/             # Export processing
+│   └── hook/               # Claude Code hook management
+├── docs/                   # Documentation
 ├── package.json
 └── tsconfig.json
 ```
 
-## アーキテクチャ方針
+## Architecture Principles
 
-- **シンプルさ優先**: 過度な抽象化を避け、読みやすいコードを維持
-- **エラーハンドリング**: 致命的でないエラーは警告を出して継続
-- **テスタビリティ**: 依存性注入を活用し、モック可能な設計
+- **Simplicity first**: Avoid over-abstraction, maintain readable code
+- **Error handling**: Non-fatal errors emit warnings and continue
+- **Testability**: Use dependency injection for mockable design
 
-## 開発ガイドライン
+## Development Guidelines
 
-### テスト駆動開発（TDD）
+### Test-Driven Development (TDD)
 
-1. テストを先に書く（Red）
-2. テストが通る最小限のコードを書く（Green）
-3. リファクタリング（Refactor）
+1. Write tests first (Red)
+2. Write minimal code to pass tests (Green)
+3. Refactoring (Refactor)
 
-### コーディング規約
+### Coding Standards
 
-- TypeScript strictモードを使用
-- ESM（ES Modules）を使用
-- エラーは適切な型で返す
+- Use TypeScript strict mode
+- Use ESM (ES Modules)
+- Return errors with appropriate types
 
-### バージョン管理（jj）
+### Version Control (jj)
 
-このプロジェクトはjj（Jujutsu）を使用しています。
+This project uses jj (Jujutsu).
 
 ```bash
-# 状態確認
+# Check status
 jj status
 jj log
 
-# 変更をコミット
+# Commit changes
 jj commit -m "feat: add new feature"
 
-# 変更を確認
+# View changes
 jj diff
 ```
 
-### コミットメッセージ
+### Commit Messages
 
-Conventional Commitsに従う:
-- `feat:` 新機能
-- `fix:` バグ修正
-- `docs:` ドキュメント
-- `test:` テスト追加・修正
-- `refactor:` リファクタリング
+Follow Conventional Commits:
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation
+- `test:` Add or modify tests
+- `refactor:` Refactoring
 
-## 主要な依存ライブラリ
+## Key Dependencies
 
-| ライブラリ | 用途 |
-|-----------|------|
-| `commander` | CLIフレームワーク |
-| `toml` | TOMLパーサー |
-| `chalk` | ターミナル色付け |
-| `vitest` | テストフレームワーク |
+| Library | Purpose |
+|---------|---------|
+| `commander` | CLI framework |
+| `toml` | TOML parser |
+| `chalk` | Terminal coloring |
+| `vitest` | Test framework |
 
-## 重要な仕様
+## Important Specifications
 
-### セッションファイルの場所
+### Session File Location
 
 ```
 ~/.claude/projects/{project-hash}/{session-id}.jsonl
 ```
 
-### フィルタリング対象
+### Filtering Targets
 
-以下を含むメッセージは出力から除外:
+Messages containing the following are excluded from output:
 - `<system-reminder>`
 - `<local-command`
 - `<command-name>`
 - `<task-notification>`
-- `No response requested`で始まる応答
-- subagentsディレクトリ配下のセッション
+- Responses starting with `No response requested`
+- Sessions under subagents directory
 
-### エラーハンドリング方針
+### Error Handling Policy
 
-| 状況 | 終了コード | 動作 |
-|------|-----------|------|
-| 設定ファイルがない | 1 | エラー終了 |
-| 出力先ディレクトリがない | 0 | 自動作成 |
-| JSONパースエラー | 0 | スキップして継続 |
-| Git操作失敗 | 0 | 警告して継続 |
+| Situation | Exit Code | Behavior |
+|-----------|-----------|----------|
+| Config file not found | 1 | Exit with error |
+| Output directory not found | 0 | Auto-create |
+| JSON parse error | 0 | Skip and continue |
+| Git operation failed | 0 | Warn and continue |
 
-## 参考ドキュメント
+## Reference Documentation
 
-- [詳細仕様](docs/spec.md)
-- [設定リファレンス](docs/configuration.md)
-- [Hooks連携](docs/hooks.md)
+- [Detailed Specification](docs/spec.md)
+- [Configuration Reference](docs/configuration.md)
+- [Hooks Integration](docs/hooks.md)

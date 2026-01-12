@@ -8,9 +8,26 @@ export interface Message {
   text: string;
 }
 
+interface AskUserQuestionOption {
+  label: string;
+  description: string;
+}
+
+interface AskUserQuestion {
+  question: string;
+  header: string;
+  options: AskUserQuestionOption[];
+}
+
 interface ContentItem {
   type: string;
   text?: string;
+  name?: string;
+  input?: {
+    questions?: AskUserQuestion[];
+  };
+  content?: string;
+  tool_use_id?: string;
 }
 
 interface RawMessage {
@@ -28,6 +45,12 @@ const FILTER_PATTERNS = [
   "<task-notification>",
 ];
 
+const FILTER_START_PATTERNS = [
+  "No response requested",
+  "You are a Claude-Mem, a specialized observer tool",
+  "Base directory for this skill:",
+];
+
 export function parseMessage(line: string): Message | null {
   try {
     const raw: RawMessage = JSON.parse(line);
@@ -43,16 +66,50 @@ export function parseMessage(line: string): Message | null {
   }
 }
 
+function formatAskUserQuestion(questions: AskUserQuestion[]): string {
+  return questions
+    .map((q) => {
+      const optionsText = q.options
+        .map((opt) => `- ${opt.label}: ${opt.description}`)
+        .join("\n");
+      return `[Question: ${q.header}]\n${q.question}\n${optionsText}`;
+    })
+    .join("\n\n");
+}
+
+function extractAskUserAnswer(content: string): string | null {
+  const match = content.match(/User has answered your questions:(.+?)(?:\. You can now continue|$)/);
+  if (match) {
+    return `[Answer]${match[1].trim()}`;
+  }
+  return null;
+}
+
 function extractText(content: string | ContentItem[]): string {
   if (typeof content === "string") {
     return content;
   }
 
-  const texts = content
-    .filter((item) => item.type === "text" && item.text)
-    .map((item) => item.text!);
+  const parts: string[] = [];
 
-  return texts.join("\n");
+  for (const item of content) {
+    if (item.type === "text" && item.text) {
+      parts.push(item.text);
+    } else if (
+      item.type === "tool_use" &&
+      item.name === "AskUserQuestion" &&
+      item.input?.questions
+    ) {
+      parts.push(formatAskUserQuestion(item.input.questions));
+    } else if (item.type === "tool_result" && typeof item.content === "string") {
+      const answer = extractAskUserAnswer(item.content);
+      if (answer) {
+        parts.push(answer);
+      }
+    }
+  }
+
+  return parts.join("\n");
 }
 
 export function shouldFilter(text: string): boolean {
@@ -62,8 +119,10 @@ export function shouldFilter(text: string): boolean {
     }
   }
 
-  if (text.startsWith("No response requested")) {
-    return true;
+  for (const pattern of FILTER_START_PATTERNS) {
+    if (text.startsWith(pattern)) {
+      return true;
+    }
   }
 
   return false;

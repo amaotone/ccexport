@@ -47,6 +47,77 @@ describe("session parser", () => {
       expect(msg?.text).toBe("first\nsecond");
     });
 
+    it("extracts AskUserQuestion tool_use as formatted question", () => {
+      const toolUse = {
+        type: "tool_use",
+        name: "AskUserQuestion",
+        input: {
+          questions: [
+            {
+              question: "Which option do you prefer?",
+              header: "Option",
+              options: [
+                { label: "Option A", description: "First choice" },
+                { label: "Option B", description: "Second choice" },
+              ],
+            },
+          ],
+        },
+      };
+      const line = JSON.stringify({
+        type: "assistant",
+        timestamp: "2026-01-12T01:30:05Z",
+        message: {
+          content: [{ type: "text", text: "Let me ask:" }, toolUse],
+        },
+      });
+      const msg = parseMessage(line);
+
+      expect(msg?.text).toContain("Let me ask:");
+      expect(msg?.text).toContain("[Question: Option]");
+      expect(msg?.text).toContain("Which option do you prefer?");
+      expect(msg?.text).toContain("- Option A: First choice");
+      expect(msg?.text).toContain("- Option B: Second choice");
+    });
+
+    it("extracts AskUserQuestion tool_result as user response", () => {
+      const toolResult = {
+        type: "tool_result",
+        tool_use_id: "toolu_123",
+        content:
+          'User has answered your questions: "Which option?"="Option A". You can now continue.',
+      };
+      const line = JSON.stringify({
+        type: "user",
+        timestamp: "2026-01-12T01:30:10Z",
+        message: {
+          content: [toolResult],
+        },
+      });
+      const msg = parseMessage(line);
+
+      expect(msg?.text).toContain("Option A");
+    });
+
+    it("ignores other tool_use types", () => {
+      const toolUse = {
+        type: "tool_use",
+        name: "Bash",
+        input: { command: "ls -la" },
+      };
+      const line = JSON.stringify({
+        type: "assistant",
+        timestamp: "2026-01-12T01:30:05Z",
+        message: {
+          content: [{ type: "text", text: "Running command" }, toolUse],
+        },
+      });
+      const msg = parseMessage(line);
+
+      expect(msg?.text).toBe("Running command");
+      expect(msg?.text).not.toContain("ls -la");
+    });
+
     it("returns null for invalid json", () => {
       const msg = parseMessage("{invalid}");
       expect(msg).toBeNull();
@@ -85,6 +156,20 @@ describe("session parser", () => {
     it("returns true for message containing system-reminder", () => {
       expect(
         shouldFilter("text before <system-reminder>text</system-reminder> after")
+      ).toBe(true);
+    });
+
+    it("returns true for claude-mem observer prompt", () => {
+      expect(
+        shouldFilter(
+          "You are a Claude-Mem, a specialized observer tool for creating searchable memory FOR FUTURE SESSIONS."
+        )
+      ).toBe(true);
+    });
+
+    it("returns true for skill base directory prompt", () => {
+      expect(
+        shouldFilter("Base directory for this skill: /Users/user/.claude/skills/dev-advisor")
       ).toBe(true);
     });
   });

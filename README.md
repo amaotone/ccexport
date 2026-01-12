@@ -1,20 +1,20 @@
 # ccexport
 
-Claude Codeの会話履歴をMarkdownにエクスポートするCLIツール
+A CLI tool that exports Claude Code conversation history to Markdown
 
-## 概要
+## Overview
 
-ccexportは、Claude Codeとの会話を自動的にMarkdownファイルとして保存するツールです。Claude Codeのhooks機能と連携し、セッション終了時に自動でエクスポートできます。
+ccexport automatically saves your conversations with Claude Code as Markdown files. It integrates with Claude Code's hooks feature to export automatically when sessions end.
 
-## インストール
+## Installation
 
-### npm（推奨）
+### npm (Recommended)
 
 ```bash
 npm install -g ccexport
 ```
 
-### ソースからビルド
+### Build from Source
 
 ```bash
 git clone https://github.com/amaotone/ccexport.git
@@ -24,103 +24,103 @@ pnpm build
 npm link
 ```
 
-## クイックスタート
+## Quick Start
 
 ```bash
-# 1. 設定ファイルを作成
+# 1. Create configuration file
 ccexport init
 
-# 2. Claude Codeフックをインストール（自動エクスポート）
+# 2. Install Claude Code hook (for automatic export)
 ccexport hook install
 
-# 3. 手動でエクスポートする場合
+# 3. Manual export
 ccexport export
 ```
 
-## 設定
+## Configuration
 
-設定ファイル: `~/.config/ccexport/config.toml`
+Configuration file: `~/.config/ccexport/config.toml`
 
 ```toml
-# 出力先ディレクトリ（必須）
+# Output directory (required)
 output_dir = "~/obsidian/claude"
 
-# ファイル名フォーマット（date-fns形式）
+# Filename format (date-fns format)
 filename_format = "yyyy-MM-dd"
 
-# 変更時にgit commitを実行するか
+# Run git commit on changes
 git_commit = false
 
-# プロジェクトの扱い: "merge" or "separate"
+# Project handling: "merge" or "separate"
 project_mode = "merge"
 ```
 
-詳細は[設定リファレンス](docs/configuration.md)を参照してください。
+See [Configuration Reference](docs/configuration.md) for details.
 
-## コマンド
+## Commands
 
 ```
 ccexport [command]
 
 Commands:
-  export      会話履歴をエクスポート（デフォルト）
-  init        設定ファイルを対話的に作成
-  hook        Claude Codeフックを設定/解除
-  config      設定の表示・編集
+  export      Export conversation history (default)
+  init        Create configuration file interactively
+  hook        Configure/remove Claude Code hooks
+  config      View/edit configuration
 
 Flags:
-  -c, --config string   設定ファイルのパス
-  -v, --verbose         詳細ログを出力
-  -h, --help            ヘルプを表示
-      --version         バージョンを表示
+  -c, --config string   Configuration file path
+  -v, --verbose         Output detailed logs
+  -h, --help            Show help
+      --version         Show version
 ```
 
-### 使用例
+### Usage Examples
 
 ```bash
-# 今日の会話をエクスポート
+# Export today's conversations
 ccexport
 
-# 特定の日付をエクスポート
+# Export specific date
 ccexport export -d 2026-01-10
 
-# 全日付をエクスポート
+# Export all dates
 ccexport export --all
 
-# dry-run（ファイルに書き込まず確認）
+# Dry-run (preview without writing files)
 ccexport export --dry-run
 ```
 
-## 出力例
+## Output Example
 
 ```markdown
-# 2026-01-12 Claude会話ログ
+# 2026-01-12 Claude Conversation Log
 
 ## 10:30 projectA
 
-**User**: TypeScriptでファイル監視する方法は？
+**User**: How do I watch files in TypeScript?
 
-**Claude**: Node.jsの`fs.watch`や`chokidar`ライブラリを使う方法があります...
+**Claude**: You can use Node.js's `fs.watch` or the `chokidar` library...
 
 ---
 
 ## 14:15 projectB
 
-**User**: Rustのライフタイムについて教えて
+**User**: Explain Rust lifetimes
 
-**Claude**: ライフタイムは参照の有効期間を...
+**Claude**: Lifetimes specify how long references are valid...
 ```
 
-## ドキュメント
+## Documentation
 
-- [設定リファレンス](docs/configuration.md)
-- [Claude Code Hooks連携](docs/hooks.md)
-- [詳細仕様](docs/spec.md)
+- [Configuration Reference](docs/configuration.md)
+- [Claude Code Hooks Integration](docs/hooks.md)
+- [Detailed Specification](docs/spec.md)
 
-## 参考
+## References
 
-- [元記事: Claude Codeとの会話を自動でObsidianに記録する仕組みを作った](https://zenn.dev/pepabo/articles/ffb79b5279f6ee)
-- [Claude Code Hooks ドキュメント](https://docs.anthropic.com/en/docs/claude-code/hooks)
+- [Original Article: Building a system to automatically record Claude Code conversations to Obsidian](https://zenn.dev/pepabo/articles/ffb79b5279f6ee)
+- [Claude Code Hooks Documentation](https://docs.anthropic.com/en/docs/claude-code/hooks)
 
 ## License
 

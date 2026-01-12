@@ -1,194 +1,194 @@
-# 詳細仕様
+# Detailed Specification
 
-## セッションファイルの仕様
+## Session File Specification
 
-### 保存場所
+### Storage Location
 
 ```
 ~/.claude/projects/{project-hash}/{session-id}.jsonl
 ```
 
-- `project-hash`: プロジェクトパスをエスケープしたもの（例: `-Users-amane-work-myapp`）
-- `session-id`: UUIDベースのセッション識別子
+- `project-hash`: Escaped project path (e.g., `-Users-amane-work-myapp`)
+- `session-id`: UUID-based session identifier
 
-### JSONL形式
+### JSONL Format
 
-各行が1つのJSONオブジェクト:
+Each line is a single JSON object:
 
 ```jsonl
-{"type":"user","timestamp":"2026-01-12T01:30:00Z","message":{"content":"質問内容"}}
-{"type":"assistant","timestamp":"2026-01-12T01:30:05Z","message":{"content":[{"type":"text","text":"回答内容"}]}}
+{"type":"user","timestamp":"2026-01-12T01:30:00Z","message":{"content":"Question content"}}
+{"type":"assistant","timestamp":"2026-01-12T01:30:05Z","message":{"content":[{"type":"text","text":"Answer content"}]}}
 ```
 
-## 出力フォーマット
+## Output Format
 
-### Markdownファイル構造
+### Markdown File Structure
 
 ```markdown
-# 2026-01-12 Claude会話ログ
+# 2026-01-12 Claude Conversation Log
 
 ## 10:30 projectA
 
-**User**: TypeScriptでファイル監視する方法は？
+**User**: How do I watch files in TypeScript?
 
-**Claude**: Node.jsの`fs.watch`や`chokidar`ライブラリを使う方法があります...
+**Claude**: You can use Node.js's `fs.watch` or the `chokidar` library...
 
 ---
 
 ## 14:15 projectB
 
-**User**: Rustのライフタイムについて教えて
+**User**: Explain Rust lifetimes
 
-**Claude**: ライフタイムは参照の有効期間を...
+**Claude**: Lifetimes specify how long references are valid...
 ```
 
-### フィルタリング（除外対象）
+### Filtering (Exclusions)
 
-以下のメッセージは出力から除外する:
+The following messages are excluded from output:
 
-- `<system-reminder>` を含むメッセージ
-- `<local-command` を含むメッセージ
-- `<command-name>` を含むメッセージ
-- `<task-notification>` を含むメッセージ
-- `No response requested` で始まるClaudeの応答
-- subagentsディレクトリ配下のセッション
+- Messages containing `<system-reminder>`
+- Messages containing `<local-command`
+- Messages containing `<command-name>`
+- Messages containing `<task-notification>`
+- Claude responses starting with `No response requested`
+- Sessions under subagents directory
 
-## エラーハンドリング
+## Error Handling
 
-| 状況 | 終了コード | 動作 |
-|------|-----------|------|
-| 設定ファイルがない | 1 | エラーメッセージを表示し終了 |
-| 出力先ディレクトリがない | 0 | 自動作成 |
-| セッションファイルがない | 0 | 警告を出力し、空のまま終了 |
-| JSONパースエラー | 0 | その行をスキップして継続 |
-| Git操作失敗 | 0 | 警告を出力して継続（エクスポート自体は成功扱い） |
-| 設定ファイルのパースエラー | 1 | エラーメッセージを表示し終了 |
+| Situation | Exit Code | Behavior |
+|-----------|-----------|----------|
+| Config file not found | 1 | Display error message and exit |
+| Output directory not found | 0 | Auto-create |
+| Session file not found | 0 | Output warning and exit normally |
+| JSON parse error | 0 | Skip that line and continue |
+| Git operation failed | 0 | Output warning and continue (export itself succeeds) |
+| Config file parse error | 1 | Display error message and exit |
 
-## CLIインターフェース詳細
+## CLI Interface Details
 
 ### `ccexport export`
 
-会話履歴をエクスポートする。引数なしで `ccexport` を実行した場合もこのコマンドが実行される。
+Export conversation history. Running `ccexport` without arguments also executes this command.
 
 ```
 Usage:
   ccexport export [flags]
 
 Flags:
-  -o, --output string    出力先ディレクトリ（設定ファイルより優先）
-  -d, --date string      対象日付（YYYY-MM-DD形式、デフォルト: 今日）
-  -p, --project string   対象プロジェクトのパス
-      --all              全日付をエクスポート
-      --dry-run          実行せずに出力内容を標準出力に表示
-  -h, --help             ヘルプを表示
+  -o, --output string    Output directory (overrides config file)
+  -d, --date string      Target date (YYYY-MM-DD format, default: today)
+  -p, --project string   Target project path
+      --all              Export all dates
+      --dry-run          Display output content without writing to files
+  -h, --help             Show help
 ```
 
-**使用例**:
+**Usage Examples**:
 
 ```bash
-# 設定ファイルに従って今日の会話をエクスポート
+# Export today's conversations according to config file
 ccexport
 ccexport export
 
-# 特定の日付をエクスポート
+# Export specific date
 ccexport export -d 2026-01-10
 
-# 出力先を一時的に変更
+# Temporarily change output directory
 ccexport export -o ~/Desktop
 
-# 特定プロジェクトのみ
+# Specific project only
 ccexport export -p /Users/amane/work/myproject
 
-# 全日付をエクスポート
+# Export all dates
 ccexport export --all
 
-# dry-run（ファイルに書き込まず標準出力に表示）
+# Dry-run (display to stdout without writing files)
 ccexport export --dry-run
 ```
 
 ### `ccexport init`
 
-設定ファイルを対話的に作成する。
+Create configuration file interactively.
 
 ```
 Usage:
   ccexport init [flags]
 
 Flags:
-      --force   既存の設定ファイルを上書き
-  -h, --help    ヘルプを表示
+      --force   Overwrite existing config file
+  -h, --help    Show help
 ```
 
-**使用例**:
+**Usage Examples**:
 
 ```bash
 $ ccexport init
-出力先ディレクトリ: ~/obsidian/claude
-ファイル名フォーマット [2006-01-02]:
-Git自動コミット (y/N): n
-プロジェクトモード (merge/separate) [merge]:
+Output directory: ~/obsidian/claude
+Filename format [yyyy-MM-dd]:
+Git auto-commit (y/N): n
+Project mode (merge/separate) [merge]:
 
-✅ 設定ファイルを作成しました: ~/.config/ccexport/config.toml
+✅ Created config file: ~/.config/ccexport/config.toml
 
-次のステップ:
-  ccexport hook install   # Claude Codeフックを設定
+Next steps:
+  ccexport hook install   # Configure Claude Code hook
 ```
 
 ### `ccexport hook`
 
-Claude Codeのフックを設定・解除する。
+Configure/remove Claude Code hooks.
 
 ```
 Usage:
   ccexport hook [command]
 
 Commands:
-  install     フックをインストール
-  uninstall   フックをアンインストール
-  status      フックの状態を表示
+  install     Install hook
+  uninstall   Uninstall hook
+  status      Show hook status
 ```
 
 ### `ccexport config`
 
-設定の表示・編集を行う。
+View/edit configuration.
 
 ```
 Usage:
   ccexport config [command]
 
 Commands:
-  show        現在の設定を表示
-  edit        エディタで設定ファイルを開く
-  set         設定値を変更
-  path        設定ファイルのパスを表示
+  show        Show current configuration
+  edit        Open config file in editor
+  set         Change configuration value
+  path        Show config file path
 ```
 
-**使用例**:
+**Usage Examples**:
 
 ```bash
-# 現在の設定を表示
+# Show current configuration
 $ ccexport config show
 output_dir = "/Users/amane/obsidian/claude"
-filename_format = "2006-01-02"
+filename_format = "yyyy-MM-dd"
 git_commit = false
 project_mode = "merge"
 
-# エディタで開く（$EDITORを使用）
+# Open in editor (uses $EDITOR)
 $ ccexport config edit
 
-# 個別の設定を変更
+# Change individual settings
 $ ccexport config set output_dir ~/Documents/claude-logs
-✅ output_dir を更新しました
+✅ Updated output_dir
 
-# 設定ファイルのパスを表示
+# Show config file path
 $ ccexport config path
 /Users/amane/.config/ccexport/config.toml
 ```
 
-## 将来の拡張案（スコープ外）
+## Future Extension Ideas (Out of Scope)
 
-- 要約の自動生成（LLM連携）
-- トピックごとの自動分類
-- Web UIでの閲覧
-- 検索機能
-- watchモード（ポーリング監視）
+- Automatic summary generation (LLM integration)
+- Automatic topic classification
+- Web UI for browsing
+- Search functionality
+- Watch mode (polling)
