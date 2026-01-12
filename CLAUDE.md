@@ -4,40 +4,41 @@
 
 ## プロジェクト概要
 
-ccexportはClaude Codeの会話履歴をMarkdownにエクスポートするGo製CLIツールです。
+ccexportはClaude Codeの会話履歴をMarkdownにエクスポートするTypeScript製CLIツールです。
 
 ## 開発コマンド
 
 ```bash
+# 開発実行
+pnpm dev
+
 # ビルド
-go build -o ccexport ./cmd/ccexport
+pnpm build
 
 # テスト実行
-go test ./...
+pnpm test
 
-# 特定パッケージのテスト
-go test ./internal/config/...
-go test ./internal/session/...
+# テスト（watchモード）
+pnpm test:watch
 
-# カバレッジ付きテスト
-go test -cover ./...
-
-# リント（golangci-lintを使用）
-golangci-lint run
+# 型チェック
+pnpm lint
 ```
 
 ## プロジェクト構成
 
 ```
 ccexport/
-├── cmd/ccexport/main.go    # エントリーポイント
-├── internal/
+├── src/
+│   ├── cli.ts              # CLIエントリーポイント
+│   ├── index.ts            # ライブラリエントリーポイント
 │   ├── config/             # 設定ファイル読み書き
+│   ├── session/            # JSONLパーサー
 │   ├── export/             # エクスポート処理
-│   ├── hook/               # Claude Codeフック管理
-│   └── session/            # JSONLパーサー
+│   └── hook/               # Claude Codeフック管理
 ├── docs/                   # ドキュメント
-└── .goreleaser.yaml        # リリース設定
+├── package.json
+└── tsconfig.json
 ```
 
 ## アーキテクチャ方針
@@ -56,9 +57,9 @@ ccexport/
 
 ### コーディング規約
 
-- Go標準のフォーマッタ（gofmt）に従う
-- エラーは適切にラップして返す（`fmt.Errorf("context: %w", err)`）
-- 公開APIにはGoDocコメントを付ける
+- TypeScript strictモードを使用
+- ESM（ES Modules）を使用
+- エラーは適切な型で返す
 
 ### バージョン管理（jj）
 
@@ -89,9 +90,10 @@ Conventional Commitsに従う:
 
 | ライブラリ | 用途 |
 |-----------|------|
-| `github.com/spf13/cobra` | CLIフレームワーク |
-| `github.com/BurntSushi/toml` | TOMLパーサー |
-| `github.com/fatih/color` | ターミナル色付け |
+| `commander` | CLIフレームワーク |
+| `toml` | TOMLパーサー |
+| `chalk` | ターミナル色付け |
+| `vitest` | テストフレームワーク |
 
 ## 重要な仕様
 

@@ -8,26 +8,20 @@ ccexportは、Claude Codeとの会話を自動的にMarkdownファイルとし�
 
 ## インストール
 
-### バイナリダウンロード（推奨）
+### npm（推奨）
 
 ```bash
-# macOS (Apple Silicon)
-curl -L https://github.com/amaotone/ccexport/releases/latest/download/ccexport-darwin-arm64 \
-  -o /usr/local/bin/ccexport && chmod +x /usr/local/bin/ccexport
-
-# macOS (Intel)
-curl -L https://github.com/amaotone/ccexport/releases/latest/download/ccexport-darwin-amd64 \
-  -o /usr/local/bin/ccexport && chmod +x /usr/local/bin/ccexport
-
-# Linux (x86_64)
-curl -L https://github.com/amaotone/ccexport/releases/latest/download/ccexport-linux-amd64 \
-  -o /usr/local/bin/ccexport && chmod +x /usr/local/bin/ccexport
+npm install -g ccexport
 ```
 
 ### ソースからビルド
 
 ```bash
-go install github.com/amaotone/ccexport@latest
+git clone https://github.com/amaotone/ccexport.git
+cd ccexport
+pnpm install
+pnpm build
+npm link
 ```
 
 ## クイックスタート
@@ -51,8 +45,8 @@ ccexport export
 # 出力先ディレクトリ（必須）
 output_dir = "~/obsidian/claude"
 
-# ファイル名フォーマット（Go time.Format形式）
-filename_format = "2006-01-02"
+# ファイル名フォーマット（date-fns形式）
+filename_format = "yyyy-MM-dd"
 
 # 変更時にgit commitを実行するか
 git_commit = false

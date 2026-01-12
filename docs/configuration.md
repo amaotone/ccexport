@@ -18,24 +18,22 @@ output_dir = "~/obsidian/claude"
 
 ### filename_format
 
-ファイル名のフォーマット。Go の time.Format 形式で指定します。
+ファイル名のフォーマット。date-fns形式で指定します。
 
 ```toml
-filename_format = "2006-01-02"
+filename_format = "yyyy-MM-dd"
 ```
 
-**デフォルト**: `"2006-01-02"`
+**デフォルト**: `"yyyy-MM-dd"`
 
-#### Go time.Format形式について
-
-Goでは参照時刻 `Mon Jan 2 15:04:05 MST 2006` を使ってフォーマットを指定します:
+#### date-fns形式について
 
 | フォーマット | 出力例 |
 |-------------|--------|
-| `2006-01-02` | 2026-01-12 |
-| `2006-01-02-Mon` | 2026-01-12-Sun |
-| `2006_01_02` | 2026_01_12 |
-| `20060102` | 20260112 |
+| `yyyy-MM-dd` | 2026-01-12 |
+| `yyyy-MM-dd-EEE` | 2026-01-12-Sun |
+| `yyyy_MM_dd` | 2026_01_12 |
+| `yyyyMMdd` | 20260112 |
 
 ### git_commit
 
@@ -89,7 +87,7 @@ project_mode = "merge"
 
 ```toml
 output_dir = "~/obsidian/claude"
-filename_format = "2006-01-02"
+filename_format = "yyyy-MM-dd"
 git_commit = false
 project_mode = "merge"
 ```
@@ -98,7 +96,7 @@ project_mode = "merge"
 
 ```toml
 output_dir = "~/Documents/claude-logs"
-filename_format = "2006-01-02"
+filename_format = "yyyy-MM-dd"
 git_commit = false
 project_mode = "separate"
 ```
@@ -107,7 +105,7 @@ project_mode = "separate"
 
 ```toml
 output_dir = "~/claude-history"
-filename_format = "2006-01-02"
+filename_format = "yyyy-MM-dd"
 git_commit = true
 project_mode = "merge"
 ```
