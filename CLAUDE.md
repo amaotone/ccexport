@@ -60,6 +60,22 @@ ccexport/
 - エラーは適切にラップして返す（`fmt.Errorf("context: %w", err)`）
 - 公開APIにはGoDocコメントを付ける
 
+### バージョン管理（jj）
+
+このプロジェクトはjj（Jujutsu）を使用しています。
+
+```bash
+# 状態確認
+jj status
+jj log
+
+# 変更をコミット
+jj commit -m "feat: add new feature"
+
+# 変更を確認
+jj diff
+```
+
 ### コミットメッセージ
 
 Conventional Commitsに従う:
