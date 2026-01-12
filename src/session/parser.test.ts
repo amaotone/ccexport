@@ -183,6 +183,20 @@ describe("session parser", () => {
         shouldFilter("Base directory for this skill: /Users/user/.claude/skills/dev-advisor")
       ).toBe(true);
     });
+
+    it("returns true for claude-mem observed_from_primary_session", () => {
+      expect(
+        shouldFilter(
+          "Hello memory agent\n<observed_from_primary_session>\n  <user_request>test</user_request>\n</observed_from_primary_session>"
+        )
+      ).toBe(true);
+    });
+
+    it("returns true for claude-mem observation output", () => {
+      expect(
+        shouldFilter("<observation>\n  <type>change</type>\n  <title>Test</title>\n</observation>")
+      ).toBe(true);
+    });
   });
 
   describe("parseSessionFile", () => {
@@ -214,11 +228,11 @@ describe("session parser", () => {
       expect(messages.length).toBe(2);
     });
 
-    it("skips external messages (claude-mem observer)", async () => {
+    it("filters claude-mem messages by XML tags", async () => {
       const sessionFile = join(tempDir, "session.jsonl");
       const content = `{"type":"user","timestamp":"2026-01-12T01:30:00Z","message":{"content":"normal message"}}
-{"type":"user","userType":"external","timestamp":"2026-01-12T01:30:01Z","message":{"content":"Hello memory agent..."}}
-{"type":"assistant","userType":"external","timestamp":"2026-01-12T01:30:02Z","message":{"content":[{"type":"text","text":"<observation>...</observation>"}]}}
+{"type":"user","timestamp":"2026-01-12T01:30:01Z","message":{"content":"<observed_from_primary_session>...</observed_from_primary_session>"}}
+{"type":"assistant","timestamp":"2026-01-12T01:30:02Z","message":{"content":[{"type":"text","text":"<observation>...</observation>"}]}}
 {"type":"assistant","timestamp":"2026-01-12T01:30:05Z","message":{"content":[{"type":"text","text":"normal response"}]}}
 `;
       await writeFile(sessionFile, content);
