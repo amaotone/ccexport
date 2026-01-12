@@ -96,7 +96,26 @@ describe("session parser", () => {
       });
       const msg = parseMessage(line);
 
-      expect(msg?.text).toContain("Option A");
+      expect(msg?.text).toBe("**Answer:** Option A");
+    });
+
+    it("extracts multiple AskUserQuestion answers", () => {
+      const toolResult = {
+        type: "tool_result",
+        tool_use_id: "toolu_123",
+        content:
+          'User has answered your questions: "Target?"="Engineers", "Type?"="Technical docs". You can now continue.',
+      };
+      const line = JSON.stringify({
+        type: "user",
+        timestamp: "2026-01-12T01:30:10Z",
+        message: {
+          content: [toolResult],
+        },
+      });
+      const msg = parseMessage(line);
+
+      expect(msg?.text).toBe("**Answer:** Engineers, Technical docs");
     });
 
     it("ignores other tool_use types", () => {

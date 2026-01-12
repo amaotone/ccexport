@@ -79,10 +79,20 @@ function formatAskUserQuestion(questions: AskUserQuestion[]): string {
 
 function extractAskUserAnswer(content: string): string | null {
   const match = content.match(/User has answered your questions:(.+?)(?:\. You can now continue|$)/);
-  if (match) {
-    return `[Answer]${match[1].trim()}`;
+  if (!match) {
+    return null;
   }
-  return null;
+
+  const rawAnswers = match[1].trim();
+  // Parse "question"="answer" format and extract only answers
+  const answerMatches = rawAnswers.matchAll(/"[^"]*"="([^"]*)"/g);
+  const answers = Array.from(answerMatches, (m) => m[1]);
+
+  if (answers.length === 0) {
+    return null;
+  }
+
+  return `**Answer:** ${answers.join(", ")}`;
 }
 
 function extractText(content: string | ContentItem[]): string {
