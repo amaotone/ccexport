@@ -16,6 +16,14 @@ export const claudeMemFilter: FilterRule = {
     if (text.includes("you are a memory agent")) {
       return true;
     }
+    // Filter summary output from claude-mem
+    if (text.includes("<summary>")) {
+      return true;
+    }
+    // Filter claude-mem status messages
+    if (text.includes("observe the primary Claude session")) {
+      return true;
+    }
     return false;
   },
 };
