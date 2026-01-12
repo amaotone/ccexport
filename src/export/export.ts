@@ -52,8 +52,6 @@ export function formatMarkdown(sessions: Session[], date: Date): string {
   );
 
   const lines: string[] = [];
-  lines.push(`# ${formatDate(date)} Claude会話ログ`);
-  lines.push("");
 
   for (let i = 0; i < sorted.length; i++) {
     lines.push(formatSession(sorted[i]));

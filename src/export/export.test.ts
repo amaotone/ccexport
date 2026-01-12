@@ -121,7 +121,6 @@ describe("export", () => {
 
       const result = formatMarkdown(sessions, baseTime);
 
-      expect(result).toMatch(/^# \d{4}-\d{2}-\d{2} Claude会話ログ/);
       expect(result).toMatch(/## \d{2}:\d{2} projectA/);
       expect(result).toMatch(/## \d{2}:\d{2} projectB/);
       expect(result).toContain("---");
