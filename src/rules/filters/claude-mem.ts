@@ -24,6 +24,16 @@ export const claudeMemFilter: FilterRule = {
     if (text.includes("observe the primary Claude session")) {
       return true;
     }
+    // Filter claude-mem waiting/skip messages
+    if (
+      text.includes("I need to observe") ||
+      text.includes("I'll wait for") ||
+      text.includes("I'll skip this observation") ||
+      text.includes("no observations to record") ||
+      text.includes("nothing to record")
+    ) {
+      return true;
+    }
     return false;
   },
 };
