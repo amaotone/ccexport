@@ -322,18 +322,19 @@ describe("export", () => {
       expect(date.getSeconds()).toBe(0);
     });
 
-    it("differs from UTC parsing for date-only strings", () => {
+    it("always returns local midnight regardless of timezone", () => {
+      // This test verifies that parseLocalDate always returns midnight in local time
+      // Unlike new Date("2026-01-12") which parses as UTC midnight
       const localDate = parseLocalDate("2026-01-12");
-      const utcDate = new Date("2026-01-12");
 
-      // Local date should be at local midnight
+      // Local date should always be at local midnight (hour 0)
       expect(localDate.getHours()).toBe(0);
+      expect(localDate.getMinutes()).toBe(0);
 
-      // UTC date parsed from date-only string is UTC midnight,
-      // which may be a different hour in local time
-      // (In JST it would be 9:00, in PST it would be 16:00 on Jan 11)
-      // We just verify they're potentially different
-      expect(localDate.getTime()).not.toBe(utcDate.getTime());
+      // The date components should match the input string
+      expect(localDate.getFullYear()).toBe(2026);
+      expect(localDate.getMonth()).toBe(0);
+      expect(localDate.getDate()).toBe(12);
     });
 
     it("handles various date formats", () => {
