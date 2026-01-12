@@ -105,8 +105,8 @@ program
         outputDir,
         filenameFormat,
         projectMode,
-        speakerUser: "👤",
-        speakerAssistant: "🤖",
+        speakerUser: "User:",
+        speakerAssistant: "Claude:",
       };
 
       await saveConfig(configPath, config);

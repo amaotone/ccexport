@@ -2,40 +2,25 @@
 
 A CLI tool that exports Claude Code conversation history to Markdown
 
-## Overview
-
-ccexport automatically saves your conversations with Claude Code as Markdown files. It integrates with Claude Code's hooks feature to export automatically when sessions end.
-
-## Installation
-
-### npm (Recommended)
-
-```bash
-npm install -g ccexport
-```
-
-### Build from Source
-
-```bash
-git clone https://github.com/amaotone/ccexport.git
-cd ccexport
-pnpm install
-pnpm build
-npm link
-```
-
 ## Quick Start
 
 ```bash
-# 1. Create configuration file
+# Install
+npm install -g ccexport
+
+# Create configuration file
 ccexport init
 
-# 2. Install Claude Code hook (for automatic export)
+# Install Claude Code hook (for automatic export)
 ccexport hook install
 
-# 3. Manual export
+# Manual export
 ccexport export
 ```
+
+## Overview
+
+ccexport automatically saves your conversations with Claude Code as Markdown files. It integrates with Claude Code's hooks feature to export automatically when sessions end.
 
 ## Configuration
 
@@ -51,8 +36,6 @@ filename_format = "yyyy-MM-dd"
 # Project handling: "merge" or "separate"
 project_mode = "merge"
 ```
-
-See [Configuration Reference](docs/configuration.md) for details.
 
 ## Commands
 
@@ -90,24 +73,18 @@ ccexport export --all
 ```markdown
 ## 10:30 projectA
 
-**User:** How do I watch files in TypeScript?
+User: How do I watch files in TypeScript?
 
-**Claude:** You can use Node.js's `fs.watch` or the `chokidar` library...
+Claude: You can use Node.js's `fs.watch` or the `chokidar` library...
 
 ---
 
 ## 14:15 projectB
 
-**User:** Explain Rust lifetimes
+User: Explain Rust lifetimes
 
-**Claude:** Lifetimes specify how long references are valid...
+Claude: Lifetimes specify how long references are valid...
 ```
-
-## Documentation
-
-- [Configuration Reference](docs/configuration.md)
-- [Claude Code Hooks Integration](docs/hooks.md)
-- [Detailed Specification](docs/spec.md)
 
 ## License
 

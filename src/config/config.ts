@@ -22,8 +22,8 @@ interface RawConfig {
 const DEFAULT_CONFIG: Omit<Config, "outputDir"> = {
   filenameFormat: "yyyy-MM-dd",
   projectMode: "merge",
-  speakerUser: "👤",
-  speakerAssistant: "🤖",
+  speakerUser: "User:",
+  speakerAssistant: "Claude:",
 };
 
 export function defaultConfigPath(): string {

@@ -69,8 +69,8 @@ speaker_assistant = "Claude:"
 
       expect(config.filenameFormat).toBe("yyyy-MM-dd");
       expect(config.projectMode).toBe("merge");
-      expect(config.speakerUser).toBe("👤");
-      expect(config.speakerAssistant).toBe("🤖");
+      expect(config.speakerUser).toBe("User:");
+      expect(config.speakerAssistant).toBe("Claude:");
     });
 
     it("throws error for nonexistent file", async () => {
@@ -85,8 +85,8 @@ speaker_assistant = "Claude:"
         outputDir: "~/claude",
         filenameFormat: "yyyy-MM-dd",
         projectMode: "separate",
-        speakerUser: "👤",
-        speakerAssistant: "🤖",
+        speakerUser: "User:",
+        speakerAssistant: "Claude:",
       };
 
       await saveConfig(configPath, config);
@@ -137,8 +137,8 @@ speaker_assistant = "Claude:"
         outputDir: "~/obsidian/claude",
         filenameFormat: "yyyy-MM-dd",
         projectMode: "merge",
-        speakerUser: "👤",
-        speakerAssistant: "🤖",
+        speakerUser: "User:",
+        speakerAssistant: "Claude:",
       };
 
       const expected = join(homedir(), "obsidian/claude");

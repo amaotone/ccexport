@@ -22,8 +22,8 @@ describe("export", () => {
       outputDir: "/tmp",
       filenameFormat: "yyyy-MM-dd",
             projectMode: "merge",
-      speakerUser: "👤",
-      speakerAssistant: "🤖",
+      speakerUser: "User:",
+      speakerAssistant: "Claude:",
     };
 
     it("formats session as markdown section with emoji speakers", () => {
@@ -51,9 +51,9 @@ describe("export", () => {
 
       // Check format pattern (HH:mm projectName)
       expect(result).toMatch(/^## \d{2}:\d{2} project/);
-      expect(result).toContain("👤 TypeScriptでファイル監視する方法は？");
+      expect(result).toContain("User: TypeScriptでファイル監視する方法は？");
       expect(result).toContain(
-        "🤖 Node.jsの`fs.watch`を使う方法があります。"
+        "Claude: Node.jsの`fs.watch`を使う方法があります。"
       );
     });
 
@@ -112,7 +112,7 @@ describe("export", () => {
 
       const result = formatSession(session, defaultConfig);
 
-      expect(result).toContain("🤖 line1\nline2\nline3");
+      expect(result).toContain("Claude: line1\nline2\nline3");
     });
   });
 
@@ -121,8 +121,8 @@ describe("export", () => {
       outputDir: "/tmp",
       filenameFormat: "yyyy-MM-dd",
             projectMode: "merge",
-      speakerUser: "👤",
-      speakerAssistant: "🤖",
+      speakerUser: "User:",
+      speakerAssistant: "Claude:",
     };
 
     it("formats multiple sessions with header", () => {
@@ -248,9 +248,9 @@ describe("export", () => {
       const config: Config = {
         outputDir: tempDir,
         filenameFormat: "yyyy-MM-dd",
-                projectMode: "merge",
-        speakerUser: "👤",
-        speakerAssistant: "🤖",
+        projectMode: "merge",
+        speakerUser: "User:",
+        speakerAssistant: "Claude:",
       };
 
       await exportSessionsWithSessions(config, { date }, sessions);
@@ -289,9 +289,9 @@ describe("export", () => {
       const config: Config = {
         outputDir: tempDir,
         filenameFormat: "yyyy-MM-dd",
-                projectMode: "separate",
-        speakerUser: "👤",
-        speakerAssistant: "🤖",
+        projectMode: "separate",
+        speakerUser: "User:",
+        speakerAssistant: "Claude:",
       };
 
       await exportSessionsWithSessions(config, { date }, sessions);
