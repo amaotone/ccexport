@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtemp, writeFile, rm, mkdir, readFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -322,19 +322,31 @@ describe("export", () => {
       expect(date.getSeconds()).toBe(0);
     });
 
-    it("always returns local midnight regardless of timezone", () => {
-      // This test verifies that parseLocalDate always returns midnight in local time
-      // Unlike new Date("2026-01-12") which parses as UTC midnight
+    it("creates local midnight while Date string creates UTC midnight", () => {
+      // parseLocalDate: 2026-01-12 00:00:00 in LOCAL time
+      // new Date("2026-01-12"): 2026-01-12 00:00:00 in UTC
       const localDate = parseLocalDate("2026-01-12");
+      const utcDate = new Date("2026-01-12");
 
-      // Local date should always be at local midnight (hour 0)
-      expect(localDate.getHours()).toBe(0);
-      expect(localDate.getMinutes()).toBe(0);
+      // The timestamp difference should equal the timezone offset
+      // In UTC: offset is 0, so both are equal
+      // In JST (UTC+9): localDate is 9 hours earlier than utcDate
+      const tzOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+      expect(localDate.getTime() - utcDate.getTime()).toBe(tzOffsetMs);
+    });
 
-      // The date components should match the input string
-      expect(localDate.getFullYear()).toBe(2026);
-      expect(localDate.getMonth()).toBe(0);
-      expect(localDate.getDate()).toBe(12);
+    it("parses correctly regardless of current system time", () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2030-06-15T23:59:59Z"));
+
+      const date = parseLocalDate("2026-01-12");
+
+      expect(date.getFullYear()).toBe(2026);
+      expect(date.getMonth()).toBe(0);
+      expect(date.getDate()).toBe(12);
+      expect(date.getHours()).toBe(0);
+
+      vi.useRealTimers();
     });
 
     it("handles various date formats", () => {
