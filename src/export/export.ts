@@ -6,6 +6,7 @@ import {
   parseSessionFile,
   getClaudeProjectsDir,
   isSubagentSession,
+  isClaudeMemObserverSession,
 } from "../session/parser.js";
 import { Config, expandPath } from "../config/config.js";
 
@@ -101,6 +102,10 @@ async function findSessionsInProject(
     const sessionPath = join(projectDir, entry);
 
     if (isSubagentSession(sessionPath)) {
+      continue;
+    }
+
+    if (await isClaudeMemObserverSession(sessionPath)) {
       continue;
     }
 

@@ -69,3 +69,31 @@ export function getClaudeProjectsDir(): string {
 export function isSubagentSession(path: string): boolean {
   return path.includes("/subagents/");
 }
+
+export async function isClaudeMemObserverSession(path: string): Promise<boolean> {
+  try {
+    const content = await readFile(path, "utf-8");
+    const lines = content.split("\n");
+
+    for (const line of lines) {
+      if (!line.trim()) continue;
+
+      try {
+        const raw = JSON.parse(line);
+        if (raw.type === "user" && raw.message?.content) {
+          const text =
+            typeof raw.message.content === "string"
+              ? raw.message.content
+              : "";
+          return text.includes("You are a Claude-Mem");
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}

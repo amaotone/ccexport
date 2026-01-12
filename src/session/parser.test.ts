@@ -8,6 +8,7 @@ import {
   parseSessionFile,
   getClaudeProjectsDir,
   isSubagentSession,
+  isClaudeMemObserverSession,
   Message,
 } from "./parser.js";
 
@@ -290,6 +291,46 @@ describe("session parser", () => {
           "/home/user/.claude/projects/-foo/subagents/nested/session.jsonl"
         )
       ).toBe(true);
+    });
+  });
+
+  describe("isClaudeMemObserverSession", () => {
+    it("returns false for normal session", async () => {
+      const sessionFile = join(tempDir, "normal-session.jsonl");
+      const content = `{"type":"user","timestamp":"2026-01-12T01:30:00Z","message":{"content":"質問内容"}}
+{"type":"assistant","timestamp":"2026-01-12T01:30:05Z","message":{"content":[{"type":"text","text":"回答内容"}]}}
+`;
+      await writeFile(sessionFile, content);
+
+      expect(await isClaudeMemObserverSession(sessionFile)).toBe(false);
+    });
+
+    it("returns true for claude-mem observer session", async () => {
+      const sessionFile = join(tempDir, "claude-mem-session.jsonl");
+      const content = `{"type":"queue-operation","operation":"dequeue","timestamp":"2026-01-12T07:55:10.519Z","sessionId":"test"}
+{"type":"user","timestamp":"2026-01-12T07:55:10.536Z","message":{"content":"You are a Claude-Mem, a specialized observer tool for creating searchable memory FOR FUTURE SESSIONS.\\n\\nCRITICAL: Record what was LEARNED/BUILT/FIXED/DEPLOYED/CONFIGURED..."}}
+{"type":"assistant","timestamp":"2026-01-12T07:55:15.055Z","message":{"content":[{"type":"text","text":"I'm ready to observe and record what happens in the primary session."}]}}
+`;
+      await writeFile(sessionFile, content);
+
+      expect(await isClaudeMemObserverSession(sessionFile)).toBe(true);
+    });
+
+    it("returns true when claude-mem prompt is in first user message", async () => {
+      const sessionFile = join(tempDir, "claude-mem-session2.jsonl");
+      const content = `{"type":"user","timestamp":"2026-01-12T07:55:10.536Z","message":{"content":"You are a Claude-Mem, a specialized observer..."}}
+{"type":"assistant","timestamp":"2026-01-12T07:55:15.055Z","message":{"content":[{"type":"text","text":"response"}]}}
+`;
+      await writeFile(sessionFile, content);
+
+      expect(await isClaudeMemObserverSession(sessionFile)).toBe(true);
+    });
+
+    it("returns false for empty file", async () => {
+      const sessionFile = join(tempDir, "empty-session.jsonl");
+      await writeFile(sessionFile, "");
+
+      expect(await isClaudeMemObserverSession(sessionFile)).toBe(false);
     });
   });
 });
