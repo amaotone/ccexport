@@ -178,14 +178,6 @@ describe("session parser", () => {
       ).toBe(true);
     });
 
-    it("returns true for claude-mem observer prompt", () => {
-      expect(
-        shouldFilter(
-          "You are a Claude-Mem, a specialized observer tool for creating searchable memory FOR FUTURE SESSIONS."
-        )
-      ).toBe(true);
-    });
-
     it("returns true for skill base directory prompt", () => {
       expect(
         shouldFilter("Base directory for this skill: /Users/user/.claude/skills/dev-advisor")
@@ -220,6 +212,22 @@ describe("session parser", () => {
       const messages = await parseSessionFile(sessionFile);
 
       expect(messages.length).toBe(2);
+    });
+
+    it("skips external messages (claude-mem observer)", async () => {
+      const sessionFile = join(tempDir, "session.jsonl");
+      const content = `{"type":"user","timestamp":"2026-01-12T01:30:00Z","message":{"content":"normal message"}}
+{"type":"user","userType":"external","timestamp":"2026-01-12T01:30:01Z","message":{"content":"Hello memory agent..."}}
+{"type":"assistant","userType":"external","timestamp":"2026-01-12T01:30:02Z","message":{"content":[{"type":"text","text":"<observation>...</observation>"}]}}
+{"type":"assistant","timestamp":"2026-01-12T01:30:05Z","message":{"content":[{"type":"text","text":"normal response"}]}}
+`;
+      await writeFile(sessionFile, content);
+
+      const messages = await parseSessionFile(sessionFile);
+
+      expect(messages.length).toBe(2);
+      expect(messages[0].text).toBe("normal message");
+      expect(messages[1].text).toBe("normal response");
     });
 
     it("filters out messages with empty text", async () => {

@@ -43,6 +43,11 @@ export async function parseSessionFile(path: string): Promise<Message[]> {
       continue;
     }
 
+    // Skip external messages (claude-mem observer)
+    if (isExternalMessage(line)) {
+      continue;
+    }
+
     const msg = parseMessage(line);
     if (!msg) {
       continue;
@@ -60,6 +65,15 @@ export async function parseSessionFile(path: string): Promise<Message[]> {
   }
 
   return messages;
+}
+
+function isExternalMessage(line: string): boolean {
+  try {
+    const raw: RawMessage = JSON.parse(line);
+    return raw.userType === "external";
+  } catch {
+    return false;
+  }
 }
 
 export function getClaudeProjectsDir(): string {

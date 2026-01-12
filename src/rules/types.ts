@@ -23,6 +23,7 @@ export interface AskUserQuestion {
 export interface RawMessage {
   type: string;
   timestamp: string;
+  userType?: string;
   message: {
     content: string | ContentItem[];
   };
