@@ -25,7 +25,7 @@ describe("hook", () => {
 
   describe("installHook", () => {
     it("creates settings file if not exists", async () => {
-      await installHook(settingsPath, "/usr/local/bin/ccexport");
+      await installHook(settingsPath);
 
       const content = await readFile(settingsPath, "utf-8");
       const settings = JSON.parse(content);
@@ -33,7 +33,7 @@ describe("hook", () => {
       expect(settings.hooks.SessionEnd).toBeDefined();
       expect(settings.hooks.SessionEnd[0].matcher).toBe("");
       expect(settings.hooks.SessionEnd[0].hooks[0].command).toBe(
-        "/usr/local/bin/ccexport export"
+        "ccexport export"
       );
     });
 
@@ -45,7 +45,7 @@ describe("hook", () => {
         })
       );
 
-      await installHook(settingsPath, "/usr/local/bin/ccexport");
+      await installHook(settingsPath);
 
       const content = await readFile(settingsPath, "utf-8");
       const settings = JSON.parse(content);
@@ -64,7 +64,7 @@ describe("hook", () => {
         })
       );
 
-      await installHook(settingsPath, "/usr/local/bin/ccexport");
+      await installHook(settingsPath);
 
       const content = await readFile(settingsPath, "utf-8");
       const settings = JSON.parse(content);

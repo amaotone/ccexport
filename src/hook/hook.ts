@@ -50,10 +50,7 @@ function isCcexportHook(matcher: HookMatcher): boolean {
   return matcher.hooks.some((h) => h.command.includes("ccexport"));
 }
 
-export async function installHook(
-  settingsPath: string,
-  ccexportPath: string
-): Promise<void> {
+export async function installHook(settingsPath: string): Promise<void> {
   const settings = await loadSettings(settingsPath);
 
   if (!settings.hooks) {
@@ -80,7 +77,7 @@ export async function installHook(
     hooks: [
       {
         type: "command",
-        command: `${ccexportPath} export`,
+        command: "ccexport export",
       },
     ],
   });

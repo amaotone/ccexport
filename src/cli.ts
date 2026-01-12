@@ -128,9 +128,7 @@ hookCommand
   .action(async () => {
     try {
       const settingsPath = defaultSettingsPath();
-      const ccexportPath = process.argv[1] || "ccexport";
-
-      await installHook(settingsPath, ccexportPath);
+      await installHook(settingsPath);
 
       console.log(chalk.green("✅ Claude Code hook configured"));
       console.log(`\nThe following was added to ${settingsPath}:`);
@@ -144,7 +142,7 @@ hookCommand
                   hooks: [
                     {
                       type: "command",
-                      command: `${ccexportPath} export`,
+                      command: "ccexport export",
                     },
                   ],
                 },
