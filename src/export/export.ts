@@ -184,6 +184,55 @@ export interface ExportOptions {
   dryRun?: boolean;
 }
 
+export async function exportSessionsWithSessions(
+  config: Config,
+  options: ExportOptions,
+  sessions: Session[]
+): Promise<string> {
+  if (sessions.length === 0) {
+    return "";
+  }
+
+  const outputDir = expandPath(options.outputDir ?? config.outputDir);
+  const filename = `${format(options.date, config.filenameFormat)}.md`;
+
+  if (config.projectMode === "separate") {
+    // Group sessions by project
+    const sessionsByProject = new Map<string, Session[]>();
+    for (const session of sessions) {
+      const existing = sessionsByProject.get(session.projectName) ?? [];
+      existing.push(session);
+      sessionsByProject.set(session.projectName, existing);
+    }
+
+    // Export each project to its own directory
+    const allMarkdown: string[] = [];
+    for (const [projectName, projectSessions] of sessionsByProject) {
+      const projectDir = join(outputDir, projectName);
+      await mkdir(projectDir, { recursive: true });
+
+      const markdown = formatMarkdown(projectSessions, options.date);
+      if (markdown && !options.dryRun) {
+        await writeFile(join(projectDir, filename), markdown);
+      }
+      allMarkdown.push(markdown);
+    }
+    return allMarkdown.join("\n\n");
+  }
+
+  // merge mode (default)
+  const markdown = formatMarkdown(sessions, options.date);
+
+  if (options.dryRun || !markdown) {
+    return markdown;
+  }
+
+  await mkdir(outputDir, { recursive: true });
+  await writeFile(join(outputDir, filename), markdown);
+
+  return markdown;
+}
+
 export async function exportSessions(
   config: Config,
   options: ExportOptions
@@ -196,19 +245,5 @@ export async function exportSessions(
     sessions = sessions.filter((s) => s.projectPath.includes(filterHash));
   }
 
-  const markdown = formatMarkdown(sessions, options.date);
-
-  if (options.dryRun || !markdown) {
-    return markdown;
-  }
-
-  const outputDir = expandPath(options.outputDir ?? config.outputDir);
-  await mkdir(outputDir, { recursive: true });
-
-  const filename = `${format(options.date, config.filenameFormat)}.md`;
-  const outputPath = join(outputDir, filename);
-
-  await writeFile(outputPath, markdown);
-
-  return markdown;
+  return exportSessionsWithSessions(config, options, sessions);
 }

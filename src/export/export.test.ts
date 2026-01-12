@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, writeFile, rm, mkdir } from "node:fs/promises";
+import { mkdtemp, writeFile, rm, mkdir, readFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { formatSession, formatMarkdown, Session } from "./export.js";
+import { formatSession, formatMarkdown, Session, exportSessionsWithSessions } from "./export.js";
 import { Message } from "../session/parser.js";
+import { Config } from "../config/config.js";
 
 describe("export", () => {
   let tempDir: string;
@@ -169,6 +170,92 @@ describe("export", () => {
     it("returns empty string for no sessions", () => {
       const result = formatMarkdown([], new Date("2026-01-12"));
       expect(result).toBe("");
+    });
+  });
+
+  describe("exportSessionsWithSessions", () => {
+    it("exports to single file in merge mode", async () => {
+      const date = new Date("2026-01-12T10:00:00Z");
+      const sessions: Session[] = [
+        {
+          id: "session1",
+          projectPath: "-Users-test-projectA",
+          projectName: "projectA",
+          messages: [
+            { type: "user", timestamp: date, text: "質問A" },
+          ],
+          startTime: date,
+        },
+        {
+          id: "session2",
+          projectPath: "-Users-test-projectB",
+          projectName: "projectB",
+          messages: [
+            { type: "user", timestamp: date, text: "質問B" },
+          ],
+          startTime: date,
+        },
+      ];
+
+      const config: Config = {
+        outputDir: tempDir,
+        filenameFormat: "yyyy-MM-dd",
+        gitCommit: false,
+        projectMode: "merge",
+      };
+
+      await exportSessionsWithSessions(config, { date }, sessions);
+
+      const files = await readdir(tempDir);
+      expect(files).toEqual(["2026-01-12.md"]);
+
+      const content = await readFile(join(tempDir, "2026-01-12.md"), "utf-8");
+      expect(content).toContain("projectA");
+      expect(content).toContain("projectB");
+    });
+
+    it("exports to separate directories in separate mode", async () => {
+      const date = new Date("2026-01-12T10:00:00Z");
+      const sessions: Session[] = [
+        {
+          id: "session1",
+          projectPath: "-Users-test-projectA",
+          projectName: "projectA",
+          messages: [
+            { type: "user", timestamp: date, text: "質問A" },
+          ],
+          startTime: date,
+        },
+        {
+          id: "session2",
+          projectPath: "-Users-test-projectB",
+          projectName: "projectB",
+          messages: [
+            { type: "user", timestamp: date, text: "質問B" },
+          ],
+          startTime: date,
+        },
+      ];
+
+      const config: Config = {
+        outputDir: tempDir,
+        filenameFormat: "yyyy-MM-dd",
+        gitCommit: false,
+        projectMode: "separate",
+      };
+
+      await exportSessionsWithSessions(config, { date }, sessions);
+
+      const dirs = await readdir(tempDir);
+      expect(dirs.sort()).toEqual(["projectA", "projectB"]);
+
+      const contentA = await readFile(join(tempDir, "projectA", "2026-01-12.md"), "utf-8");
+      expect(contentA).toContain("projectA");
+      expect(contentA).not.toContain("projectB");
+
+      const contentB = await readFile(join(tempDir, "projectB", "2026-01-12.md"), "utf-8");
+      expect(contentB).toContain("projectB");
+      expect(contentB).not.toContain("projectA");
     });
   });
 });
