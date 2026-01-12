@@ -21,8 +21,7 @@ describe("export", () => {
     const defaultConfig: Config = {
       outputDir: "/tmp",
       filenameFormat: "yyyy-MM-dd",
-      gitCommit: false,
-      projectMode: "merge",
+            projectMode: "merge",
       speakerUser: "👤",
       speakerAssistant: "🤖",
     };
@@ -121,8 +120,7 @@ describe("export", () => {
     const defaultConfig: Config = {
       outputDir: "/tmp",
       filenameFormat: "yyyy-MM-dd",
-      gitCommit: false,
-      projectMode: "merge",
+            projectMode: "merge",
       speakerUser: "👤",
       speakerAssistant: "🤖",
     };
@@ -250,8 +248,7 @@ describe("export", () => {
       const config: Config = {
         outputDir: tempDir,
         filenameFormat: "yyyy-MM-dd",
-        gitCommit: false,
-        projectMode: "merge",
+                projectMode: "merge",
         speakerUser: "👤",
         speakerAssistant: "🤖",
       };
@@ -292,8 +289,7 @@ describe("export", () => {
       const config: Config = {
         outputDir: tempDir,
         filenameFormat: "yyyy-MM-dd",
-        gitCommit: false,
-        projectMode: "separate",
+                projectMode: "separate",
         speakerUser: "👤",
         speakerAssistant: "🤖",
       };

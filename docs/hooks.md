@@ -12,14 +12,14 @@ Reference: https://docs.anthropic.com/en/docs/claude-code/hooks
 
 ## Hook Used
 
-Uses **PostToolUse** hook with **Stop** tool (session end) as trigger:
+Uses **SessionEnd** hook (session termination) as trigger:
 
 ```json
 {
   "hooks": {
-    "PostToolUse": [
+    "SessionEnd": [
       {
-        "matcher": "Stop",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
@@ -32,6 +32,8 @@ Uses **PostToolUse** hook with **Stop** tool (session end) as trigger:
 }
 ```
 
+**Note:** SessionEnd fires on clean termination (`/exit`, Ctrl+D). It does not fire on forced termination (Ctrl+C). Sessions terminated with Ctrl+C will be exported on the next manual run or next SessionEnd.
+
 ## Hook Management
 
 ### Install
@@ -43,9 +45,9 @@ $ ccexport hook install
 The following was added to ~/.claude/settings.json:
 {
   "hooks": {
-    "PostToolUse": [
+    "SessionEnd": [
       {
-        "matcher": "Stop",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
@@ -63,7 +65,7 @@ The following was added to ~/.claude/settings.json:
 ```bash
 $ ccexport hook status
 ✅ Hook is installed
-   Trigger: PostToolUse (Stop)
+   Trigger: SessionEnd
    Command: /usr/local/bin/ccexport export
 ```
 

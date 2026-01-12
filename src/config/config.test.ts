@@ -34,7 +34,6 @@ describe("config", () => {
       const content = `
 output_dir = "~/obsidian/claude"
 filename_format = "yyyy-MM-dd"
-git_commit = true
 project_mode = "separate"
 `;
       await writeFile(configPath, content);
@@ -43,7 +42,6 @@ project_mode = "separate"
 
       expect(config.outputDir).toBe("~/obsidian/claude");
       expect(config.filenameFormat).toBe("yyyy-MM-dd");
-      expect(config.gitCommit).toBe(true);
       expect(config.projectMode).toBe("separate");
     });
 
@@ -70,7 +68,6 @@ speaker_assistant = "Claude:"
       const config = await loadConfig(configPath);
 
       expect(config.filenameFormat).toBe("yyyy-MM-dd");
-      expect(config.gitCommit).toBe(false);
       expect(config.projectMode).toBe("merge");
       expect(config.speakerUser).toBe("👤");
       expect(config.speakerAssistant).toBe("🤖");
@@ -87,7 +84,6 @@ speaker_assistant = "Claude:"
       const config: Config = {
         outputDir: "~/claude",
         filenameFormat: "yyyy-MM-dd",
-        gitCommit: true,
         projectMode: "separate",
         speakerUser: "👤",
         speakerAssistant: "🤖",
@@ -97,7 +93,7 @@ speaker_assistant = "Claude:"
 
       const loaded = await loadConfig(configPath);
       expect(loaded.outputDir).toBe(config.outputDir);
-      expect(loaded.gitCommit).toBe(config.gitCommit);
+      expect(loaded.projectMode).toBe(config.projectMode);
     });
 
     it("saves and loads speaker labels", async () => {
@@ -105,7 +101,6 @@ speaker_assistant = "Claude:"
       const config: Config = {
         outputDir: "/tmp",
         filenameFormat: "yyyy-MM-dd",
-        gitCommit: false,
         projectMode: "merge",
         speakerUser: "User:",
         speakerAssistant: "Claude:",
@@ -141,7 +136,6 @@ speaker_assistant = "Claude:"
       const config: Config = {
         outputDir: "~/obsidian/claude",
         filenameFormat: "yyyy-MM-dd",
-        gitCommit: false,
         projectMode: "merge",
         speakerUser: "👤",
         speakerAssistant: "🤖",

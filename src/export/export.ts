@@ -179,7 +179,6 @@ export interface ExportOptions {
   date: Date;
   outputDir?: string;
   projectFilter?: string;
-  dryRun?: boolean;
 }
 
 export async function exportSessionsWithSessions(
@@ -210,7 +209,7 @@ export async function exportSessionsWithSessions(
       await mkdir(projectDir, { recursive: true });
 
       const markdown = formatMarkdown(projectSessions, options.date, config);
-      if (markdown && !options.dryRun) {
+      if (markdown) {
         await writeFile(join(projectDir, filename), markdown);
       }
       allMarkdown.push(markdown);
@@ -221,7 +220,7 @@ export async function exportSessionsWithSessions(
   // merge mode (default)
   const markdown = formatMarkdown(sessions, options.date, config);
 
-  if (options.dryRun || !markdown) {
+  if (!markdown) {
     return markdown;
   }
 

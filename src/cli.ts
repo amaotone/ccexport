@@ -37,7 +37,6 @@ program
   .option("-d, --date <date>", "Target date (YYYY-MM-DD)")
   .option("-p, --project <path>", "Target project path")
   .option("--all", "Export all dates")
-  .option("--dry-run", "Display output without writing files")
   .action(async (options) => {
     try {
       const configPath = program.opts().config || defaultConfigPath();
@@ -49,12 +48,9 @@ program
         date,
         outputDir: options.output,
         projectFilter: options.project,
-        dryRun: options.dryRun,
       });
 
-      if (options.dryRun) {
-        console.log(markdown || "(No sessions to export)");
-      } else if (markdown) {
+      if (markdown) {
         console.log(chalk.green("✅ Export completed"));
       } else {
         console.log(chalk.yellow("No sessions to export"));
@@ -99,8 +95,6 @@ program
       const filenameFormat =
         (await question("Filename format [yyyy-MM-dd]: ")) ||
         "yyyy-MM-dd";
-      const gitCommitStr = await question("Git auto-commit (y/N): ");
-      const gitCommit = gitCommitStr.toLowerCase() === "y";
       const projectModeStr = await question(
         "Project mode (merge/separate) [merge]: "
       );
@@ -110,7 +104,6 @@ program
       const config: Config = {
         outputDir,
         filenameFormat,
-        gitCommit,
         projectMode,
         speakerUser: "👤",
         speakerAssistant: "🤖",
@@ -145,9 +138,9 @@ hookCommand
         JSON.stringify(
           {
             hooks: {
-              PostToolUse: [
+              SessionEnd: [
                 {
-                  matcher: "Stop",
+                  matcher: "",
                   hooks: [
                     {
                       type: "command",
@@ -217,7 +210,6 @@ configCommand
 
       console.log(`output_dir = "${config.outputDir}"`);
       console.log(`filename_format = "${config.filenameFormat}"`);
-      console.log(`git_commit = ${config.gitCommit}`);
       console.log(`project_mode = "${config.projectMode}"`);
     } catch (error) {
       console.error(chalk.red(`Error: ${(error as Error).message}`));
@@ -247,9 +239,6 @@ configCommand
           break;
         case "filename_format":
           config.filenameFormat = value;
-          break;
-        case "git_commit":
-          config.gitCommit = value === "true";
           break;
         case "project_mode":
           if (value !== "merge" && value !== "separate") {

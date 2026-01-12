@@ -30,9 +30,9 @@ describe("hook", () => {
       const content = await readFile(settingsPath, "utf-8");
       const settings = JSON.parse(content);
 
-      expect(settings.hooks.PostToolUse).toBeDefined();
-      expect(settings.hooks.PostToolUse[0].matcher).toBe("Stop");
-      expect(settings.hooks.PostToolUse[0].hooks[0].command).toBe(
+      expect(settings.hooks.SessionEnd).toBeDefined();
+      expect(settings.hooks.SessionEnd[0].matcher).toBe("");
+      expect(settings.hooks.SessionEnd[0].hooks[0].command).toBe(
         "/usr/local/bin/ccexport export"
       );
     });
@@ -51,7 +51,7 @@ describe("hook", () => {
       const settings = JSON.parse(content);
 
       expect(settings.existingSetting).toBe(true);
-      expect(settings.hooks.PostToolUse).toBeDefined();
+      expect(settings.hooks.SessionEnd).toBeDefined();
     });
 
     it("preserves existing hooks", async () => {
@@ -70,7 +70,7 @@ describe("hook", () => {
       const settings = JSON.parse(content);
 
       expect(settings.hooks.PreToolUse).toBeDefined();
-      expect(settings.hooks.PostToolUse).toBeDefined();
+      expect(settings.hooks.SessionEnd).toBeDefined();
     });
   });
 
@@ -80,9 +80,9 @@ describe("hook", () => {
         settingsPath,
         JSON.stringify({
           hooks: {
-            PostToolUse: [
+            SessionEnd: [
               {
-                matcher: "Stop",
+                matcher: "",
                 hooks: [
                   { type: "command", command: "/usr/local/bin/ccexport export" },
                 ],
@@ -97,7 +97,7 @@ describe("hook", () => {
       const content = await readFile(settingsPath, "utf-8");
       const settings = JSON.parse(content);
 
-      expect(settings.hooks.PostToolUse).toHaveLength(0);
+      expect(settings.hooks.SessionEnd).toHaveLength(0);
     });
 
     it("preserves other hooks", async () => {
@@ -105,15 +105,15 @@ describe("hook", () => {
         settingsPath,
         JSON.stringify({
           hooks: {
-            PostToolUse: [
+            SessionEnd: [
               {
-                matcher: "Stop",
+                matcher: "",
                 hooks: [
                   { type: "command", command: "/usr/local/bin/ccexport export" },
                 ],
               },
               {
-                matcher: "OtherTool",
+                matcher: "",
                 hooks: [{ type: "command", command: "other-command" }],
               },
             ],
@@ -126,8 +126,8 @@ describe("hook", () => {
       const content = await readFile(settingsPath, "utf-8");
       const settings = JSON.parse(content);
 
-      expect(settings.hooks.PostToolUse).toHaveLength(1);
-      expect(settings.hooks.PostToolUse[0].matcher).toBe("OtherTool");
+      expect(settings.hooks.SessionEnd).toHaveLength(1);
+      expect(settings.hooks.SessionEnd[0].hooks[0].command).toBe("other-command");
     });
 
     it("does nothing if no settings file", async () => {
@@ -154,9 +154,9 @@ describe("hook", () => {
         settingsPath,
         JSON.stringify({
           hooks: {
-            PostToolUse: [
+            SessionEnd: [
               {
-                matcher: "Stop",
+                matcher: "",
                 hooks: [
                   { type: "command", command: "/usr/local/bin/ccexport export" },
                 ],
@@ -169,7 +169,7 @@ describe("hook", () => {
       const status = await getHookStatus(settingsPath);
 
       expect(status.installed).toBe(true);
-      expect(status.trigger).toBe("PostToolUse (Stop)");
+      expect(status.trigger).toBe("SessionEnd");
       expect(status.command).toBe("/usr/local/bin/ccexport export");
     });
   });

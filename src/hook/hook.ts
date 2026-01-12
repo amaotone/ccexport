@@ -14,6 +14,7 @@ interface HookMatcher {
 
 interface ClaudeSettings {
   hooks?: {
+    SessionEnd?: HookMatcher[];
     PostToolUse?: HookMatcher[];
     PreToolUse?: HookMatcher[];
     [key: string]: HookMatcher[] | undefined;
@@ -46,10 +47,7 @@ async function saveSettings(path: string, settings: ClaudeSettings): Promise<voi
 }
 
 function isCcexportHook(matcher: HookMatcher): boolean {
-  return (
-    matcher.matcher === "Stop" &&
-    matcher.hooks.some((h) => h.command.includes("ccexport"))
-  );
+  return matcher.hooks.some((h) => h.command.includes("ccexport"));
 }
 
 export async function installHook(
@@ -62,18 +60,23 @@ export async function installHook(
     settings.hooks = {};
   }
 
-  if (!settings.hooks.PostToolUse) {
-    settings.hooks.PostToolUse = [];
+  if (!settings.hooks.SessionEnd) {
+    settings.hooks.SessionEnd = [];
   }
 
-  // Remove existing ccexport hook if present
-  settings.hooks.PostToolUse = settings.hooks.PostToolUse.filter(
+  // Remove existing ccexport hook if present (from SessionEnd or old PostToolUse)
+  settings.hooks.SessionEnd = settings.hooks.SessionEnd.filter(
     (m) => !isCcexportHook(m)
   );
+  if (settings.hooks.PostToolUse) {
+    settings.hooks.PostToolUse = settings.hooks.PostToolUse.filter(
+      (m) => !isCcexportHook(m)
+    );
+  }
 
   // Add new hook
-  settings.hooks.PostToolUse.push({
-    matcher: "Stop",
+  settings.hooks.SessionEnd.push({
+    matcher: "",
     hooks: [
       {
         type: "command",
@@ -93,13 +96,23 @@ export async function uninstallHook(settingsPath: string): Promise<void> {
     return; // No settings file, nothing to do
   }
 
-  if (!settings.hooks?.PostToolUse) {
+  if (!settings.hooks) {
     return;
   }
 
-  settings.hooks.PostToolUse = settings.hooks.PostToolUse.filter(
-    (m) => !isCcexportHook(m)
-  );
+  // Remove from SessionEnd
+  if (settings.hooks.SessionEnd) {
+    settings.hooks.SessionEnd = settings.hooks.SessionEnd.filter(
+      (m) => !isCcexportHook(m)
+    );
+  }
+
+  // Also remove from old PostToolUse location
+  if (settings.hooks.PostToolUse) {
+    settings.hooks.PostToolUse = settings.hooks.PostToolUse.filter(
+      (m) => !isCcexportHook(m)
+    );
+  }
 
   await saveSettings(settingsPath, settings);
 }
@@ -112,11 +125,11 @@ export async function getHookStatus(settingsPath: string): Promise<HookStatus> {
     return { installed: false };
   }
 
-  if (!settings.hooks?.PostToolUse) {
+  if (!settings.hooks?.SessionEnd) {
     return { installed: false };
   }
 
-  const ccexportHook = settings.hooks.PostToolUse.find((m) => isCcexportHook(m));
+  const ccexportHook = settings.hooks.SessionEnd.find((m) => isCcexportHook(m));
 
   if (!ccexportHook) {
     return { installed: false };
@@ -128,7 +141,7 @@ export async function getHookStatus(settingsPath: string): Promise<HookStatus> {
 
   return {
     installed: true,
-    trigger: `PostToolUse (${ccexportHook.matcher})`,
+    trigger: "SessionEnd",
     command: commandHook?.command,
   };
 }
