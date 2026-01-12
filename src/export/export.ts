@@ -34,7 +34,7 @@ export function formatSession(session: Session, config: Config): string {
 
   for (const msg of session.messages) {
     const speaker = msg.type === "user" ? config.speakerUser : config.speakerAssistant;
-    lines.push(`**${speaker}**: ${msg.text}`);
+    lines.push(`${speaker} ${msg.text}`);
     lines.push("");
   }
 

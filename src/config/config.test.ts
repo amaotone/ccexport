@@ -51,15 +51,15 @@ project_mode = "separate"
       const configPath = join(tempDir, "config.toml");
       const content = `
 output_dir = "/tmp"
-speaker_user = "User"
-speaker_assistant = "Claude"
+speaker_user = "User:"
+speaker_assistant = "Claude:"
 `;
       await writeFile(configPath, content);
 
       const config = await loadConfig(configPath);
 
-      expect(config.speakerUser).toBe("User");
-      expect(config.speakerAssistant).toBe("Claude");
+      expect(config.speakerUser).toBe("User:");
+      expect(config.speakerAssistant).toBe("Claude:");
     });
 
     it("uses default values for missing fields", async () => {
@@ -107,15 +107,15 @@ speaker_assistant = "Claude"
         filenameFormat: "yyyy-MM-dd",
         gitCommit: false,
         projectMode: "merge",
-        speakerUser: "User",
-        speakerAssistant: "Claude",
+        speakerUser: "User:",
+        speakerAssistant: "Claude:",
       };
 
       await saveConfig(configPath, config);
 
       const loaded = await loadConfig(configPath);
-      expect(loaded.speakerUser).toBe("User");
-      expect(loaded.speakerAssistant).toBe("Claude");
+      expect(loaded.speakerUser).toBe("User:");
+      expect(loaded.speakerAssistant).toBe("Claude:");
     });
   });
 

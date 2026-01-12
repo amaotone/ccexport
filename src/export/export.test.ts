@@ -52,9 +52,9 @@ describe("export", () => {
 
       // Check format pattern (HH:mm projectName)
       expect(result).toMatch(/^## \d{2}:\d{2} project/);
-      expect(result).toContain("**👤**: TypeScriptでファイル監視する方法は？");
+      expect(result).toContain("👤 TypeScriptでファイル監視する方法は？");
       expect(result).toContain(
-        "**🤖**: Node.jsの`fs.watch`を使う方法があります。"
+        "🤖 Node.jsの`fs.watch`を使う方法があります。"
       );
     });
 
@@ -81,14 +81,14 @@ describe("export", () => {
 
       const config: Config = {
         ...defaultConfig,
-        speakerUser: "User",
-        speakerAssistant: "Claude",
+        speakerUser: "User:",
+        speakerAssistant: "Claude:",
       };
 
       const result = formatSession(session, config);
 
-      expect(result).toContain("**User**: 質問");
-      expect(result).toContain("**Claude**: 回答");
+      expect(result).toContain("User: 質問");
+      expect(result).toContain("Claude: 回答");
     });
 
     it("handles multiline messages", () => {
@@ -113,7 +113,7 @@ describe("export", () => {
 
       const result = formatSession(session, defaultConfig);
 
-      expect(result).toContain("**🤖**: line1\nline2\nline3");
+      expect(result).toContain("🤖 line1\nline2\nline3");
     });
   });
 
