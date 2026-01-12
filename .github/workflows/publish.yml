@@ -1,8 +1,10 @@
 name: Publish to npm
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
   workflow_dispatch:
     inputs:
       dry-run:
@@ -21,10 +23,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check if version changed
+        id: version-check
+        run: |
+          # Get version from package.json
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+
+          # Check if this version is already published
+          if npm view ccexport@$PACKAGE_VERSION version 2>/dev/null; then
+            echo "Version $PACKAGE_VERSION already published"
+            echo "should_publish=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version $PACKAGE_VERSION not published yet"
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup pnpm
+        if: steps.version-check.outputs.should_publish == 'true' || github.event_name == 'workflow_dispatch'
         uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
+        if: steps.version-check.outputs.should_publish == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -32,25 +52,33 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
+        if: steps.version-check.outputs.should_publish == 'true' || github.event_name == 'workflow_dispatch'
         run: pnpm install --frozen-lockfile
 
       - name: Lint
+        if: steps.version-check.outputs.should_publish == 'true' || github.event_name == 'workflow_dispatch'
         run: pnpm lint
 
       - name: Test
+        if: steps.version-check.outputs.should_publish == 'true' || github.event_name == 'workflow_dispatch'
         run: pnpm test
 
       - name: Build
+        if: steps.version-check.outputs.should_publish == 'true' || github.event_name == 'workflow_dispatch'
         run: pnpm build
 
       - name: Publish (dry-run)
-        if: ${{ github.event.inputs.dry-run == 'true' }}
+        if: github.event.inputs.dry-run == 'true'
         run: pnpm publish --dry-run --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish
-        if: ${{ github.event.inputs.dry-run != 'true' }}
+        if: steps.version-check.outputs.should_publish == 'true' && github.event.inputs.dry-run != 'true'
         run: pnpm publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Skip publish
+        if: steps.version-check.outputs.should_publish == 'false' && github.event_name != 'workflow_dispatch'
+        run: echo "Skipping publish - version ${{ steps.version-check.outputs.package_version }} already exists on npm"
