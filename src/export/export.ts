@@ -70,6 +70,15 @@ function projectHashToName(hash: string): string {
   return parts[parts.length - 1] || hash;
 }
 
+/**
+ * Parse date string as local midnight (not UTC)
+ * "2026-01-12" → 2026-01-12T00:00:00 in local timezone
+ */
+export function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
 function sameDate(d1: Date, d2: Date): boolean {
   return (
     d1.getFullYear() === d2.getFullYear() &&

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, writeFile, rm, mkdir, readFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { formatSession, formatMarkdown, Session, exportSessionsWithSessions } from "./export.js";
+import { formatSession, formatMarkdown, Session, exportSessionsWithSessions, parseLocalDate } from "./export.js";
 import { Message } from "../session/parser.js";
 import { Config } from "../config/config.js";
 
@@ -306,6 +306,46 @@ describe("export", () => {
       const contentB = await readFile(join(tempDir, "projectB", "2026-01-12.md"), "utf-8");
       expect(contentB).toContain("projectB");
       expect(contentB).not.toContain("projectA");
+    });
+  });
+
+  describe("parseLocalDate", () => {
+    it("parses date string as local midnight", () => {
+      const date = parseLocalDate("2026-01-12");
+
+      // Should be local midnight, not UTC
+      expect(date.getFullYear()).toBe(2026);
+      expect(date.getMonth()).toBe(0); // January is 0
+      expect(date.getDate()).toBe(12);
+      expect(date.getHours()).toBe(0);
+      expect(date.getMinutes()).toBe(0);
+      expect(date.getSeconds()).toBe(0);
+    });
+
+    it("differs from UTC parsing for date-only strings", () => {
+      const localDate = parseLocalDate("2026-01-12");
+      const utcDate = new Date("2026-01-12");
+
+      // Local date should be at local midnight
+      expect(localDate.getHours()).toBe(0);
+
+      // UTC date parsed from date-only string is UTC midnight,
+      // which may be a different hour in local time
+      // (In JST it would be 9:00, in PST it would be 16:00 on Jan 11)
+      // We just verify they're potentially different
+      expect(localDate.getTime()).not.toBe(utcDate.getTime());
+    });
+
+    it("handles various date formats", () => {
+      const date1 = parseLocalDate("2025-12-31");
+      expect(date1.getFullYear()).toBe(2025);
+      expect(date1.getMonth()).toBe(11); // December
+      expect(date1.getDate()).toBe(31);
+
+      const date2 = parseLocalDate("2026-06-15");
+      expect(date2.getFullYear()).toBe(2026);
+      expect(date2.getMonth()).toBe(5); // June
+      expect(date2.getDate()).toBe(15);
     });
   });
 });

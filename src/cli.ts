@@ -10,7 +10,7 @@ import {
   expandPath,
   Config,
 } from "./config/config.js";
-import { exportSessions } from "./export/export.js";
+import { exportSessions, parseLocalDate } from "./export/export.js";
 import {
   installHook,
   uninstallHook,
@@ -42,7 +42,7 @@ program
       const configPath = program.opts().config || defaultConfigPath();
       const config = await loadConfig(configPath);
 
-      const date = options.date ? new Date(options.date) : new Date();
+      const date = options.date ? parseLocalDate(options.date) : new Date();
 
       const markdown = await exportSessions(config, {
         date,

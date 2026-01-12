@@ -1,6 +1,6 @@
 {
   "name": "ccexport",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Export Claude Code conversation history to Markdown",
   "type": "module",
   "bin": {
