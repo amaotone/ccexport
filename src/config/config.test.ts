@@ -47,6 +47,21 @@ project_mode = "separate"
       expect(config.projectMode).toBe("separate");
     });
 
+    it("loads speaker labels from config", async () => {
+      const configPath = join(tempDir, "config.toml");
+      const content = `
+output_dir = "/tmp"
+speaker_user = "User"
+speaker_assistant = "Claude"
+`;
+      await writeFile(configPath, content);
+
+      const config = await loadConfig(configPath);
+
+      expect(config.speakerUser).toBe("User");
+      expect(config.speakerAssistant).toBe("Claude");
+    });
+
     it("uses default values for missing fields", async () => {
       const configPath = join(tempDir, "config.toml");
       const content = `output_dir = "/tmp/claude"`;
@@ -57,6 +72,8 @@ project_mode = "separate"
       expect(config.filenameFormat).toBe("yyyy-MM-dd");
       expect(config.gitCommit).toBe(false);
       expect(config.projectMode).toBe("merge");
+      expect(config.speakerUser).toBe("👤");
+      expect(config.speakerAssistant).toBe("🤖");
     });
 
     it("throws error for nonexistent file", async () => {
@@ -72,6 +89,8 @@ project_mode = "separate"
         filenameFormat: "yyyy-MM-dd",
         gitCommit: true,
         projectMode: "separate",
+        speakerUser: "👤",
+        speakerAssistant: "🤖",
       };
 
       await saveConfig(configPath, config);
@@ -79,6 +98,24 @@ project_mode = "separate"
       const loaded = await loadConfig(configPath);
       expect(loaded.outputDir).toBe(config.outputDir);
       expect(loaded.gitCommit).toBe(config.gitCommit);
+    });
+
+    it("saves and loads speaker labels", async () => {
+      const configPath = join(tempDir, "speaker-config.toml");
+      const config: Config = {
+        outputDir: "/tmp",
+        filenameFormat: "yyyy-MM-dd",
+        gitCommit: false,
+        projectMode: "merge",
+        speakerUser: "User",
+        speakerAssistant: "Claude",
+      };
+
+      await saveConfig(configPath, config);
+
+      const loaded = await loadConfig(configPath);
+      expect(loaded.speakerUser).toBe("User");
+      expect(loaded.speakerAssistant).toBe("Claude");
     });
   });
 
@@ -106,6 +143,8 @@ project_mode = "separate"
         filenameFormat: "yyyy-MM-dd",
         gitCommit: false,
         projectMode: "merge",
+        speakerUser: "👤",
+        speakerAssistant: "🤖",
       };
 
       const expected = join(homedir(), "obsidian/claude");

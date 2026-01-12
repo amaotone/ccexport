@@ -8,6 +8,8 @@ export interface Config {
   filenameFormat: string;
   gitCommit: boolean;
   projectMode: "merge" | "separate";
+  speakerUser: string;
+  speakerAssistant: string;
 }
 
 interface RawConfig {
@@ -15,12 +17,16 @@ interface RawConfig {
   filename_format?: string;
   git_commit?: boolean;
   project_mode?: string;
+  speaker_user?: string;
+  speaker_assistant?: string;
 }
 
 const DEFAULT_CONFIG: Omit<Config, "outputDir"> = {
   filenameFormat: "yyyy-MM-dd",
   gitCommit: false,
   projectMode: "merge",
+  speakerUser: "👤",
+  speakerAssistant: "🤖",
 };
 
 export function defaultConfigPath(): string {
@@ -37,6 +43,8 @@ export async function loadConfig(path: string): Promise<Config> {
     gitCommit: raw.git_commit ?? DEFAULT_CONFIG.gitCommit,
     projectMode:
       (raw.project_mode as Config["projectMode"]) ?? DEFAULT_CONFIG.projectMode,
+    speakerUser: raw.speaker_user ?? DEFAULT_CONFIG.speakerUser,
+    speakerAssistant: raw.speaker_assistant ?? DEFAULT_CONFIG.speakerAssistant,
   };
 }
 
@@ -47,6 +55,8 @@ export async function saveConfig(path: string, config: Config): Promise<void> {
 filename_format = "${config.filenameFormat}"
 git_commit = ${config.gitCommit}
 project_mode = "${config.projectMode}"
+speaker_user = "${config.speakerUser}"
+speaker_assistant = "${config.speakerAssistant}"
 `;
 
   await writeFile(path, content);

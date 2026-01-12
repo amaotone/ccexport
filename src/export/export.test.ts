@@ -18,7 +18,16 @@ describe("export", () => {
   });
 
   describe("formatSession", () => {
-    it("formats session as markdown section", () => {
+    const defaultConfig: Config = {
+      outputDir: "/tmp",
+      filenameFormat: "yyyy-MM-dd",
+      gitCommit: false,
+      projectMode: "merge",
+      speakerUser: "👤",
+      speakerAssistant: "🤖",
+    };
+
+    it("formats session as markdown section with emoji speakers", () => {
       const now = new Date();
       const session: Session = {
         id: "test-session",
@@ -39,14 +48,47 @@ describe("export", () => {
         startTime: now,
       };
 
-      const result = formatSession(session);
+      const result = formatSession(session, defaultConfig);
 
       // Check format pattern (HH:mm projectName)
       expect(result).toMatch(/^## \d{2}:\d{2} project/);
-      expect(result).toContain("**User**: TypeScriptでファイル監視する方法は？");
+      expect(result).toContain("**👤**: TypeScriptでファイル監視する方法は？");
       expect(result).toContain(
-        "**Claude**: Node.jsの`fs.watch`を使う方法があります。"
+        "**🤖**: Node.jsの`fs.watch`を使う方法があります。"
       );
+    });
+
+    it("uses custom speaker labels from config", () => {
+      const now = new Date();
+      const session: Session = {
+        id: "test-session",
+        projectPath: "-Users-test-project",
+        projectName: "project",
+        messages: [
+          {
+            type: "user",
+            timestamp: now,
+            text: "質問",
+          },
+          {
+            type: "assistant",
+            timestamp: new Date(now.getTime() + 5000),
+            text: "回答",
+          },
+        ],
+        startTime: now,
+      };
+
+      const config: Config = {
+        ...defaultConfig,
+        speakerUser: "User",
+        speakerAssistant: "Claude",
+      };
+
+      const result = formatSession(session, config);
+
+      expect(result).toContain("**User**: 質問");
+      expect(result).toContain("**Claude**: 回答");
     });
 
     it("handles multiline messages", () => {
@@ -69,13 +111,22 @@ describe("export", () => {
         startTime: new Date("2026-01-12T10:30:00Z"),
       };
 
-      const result = formatSession(session);
+      const result = formatSession(session, defaultConfig);
 
-      expect(result).toContain("**Claude**: line1\nline2\nline3");
+      expect(result).toContain("**🤖**: line1\nline2\nline3");
     });
   });
 
   describe("formatMarkdown", () => {
+    const defaultConfig: Config = {
+      outputDir: "/tmp",
+      filenameFormat: "yyyy-MM-dd",
+      gitCommit: false,
+      projectMode: "merge",
+      speakerUser: "👤",
+      speakerAssistant: "🤖",
+    };
+
     it("formats multiple sessions with header", () => {
       const baseTime = new Date();
       const laterTime = new Date(baseTime.getTime() + 3600000); // 1 hour later
@@ -119,7 +170,7 @@ describe("export", () => {
         },
       ];
 
-      const result = formatMarkdown(sessions, baseTime);
+      const result = formatMarkdown(sessions, baseTime, defaultConfig);
 
       expect(result).toMatch(/## \d{2}:\d{2} projectA/);
       expect(result).toMatch(/## \d{2}:\d{2} projectB/);
@@ -159,7 +210,7 @@ describe("export", () => {
         },
       ];
 
-      const result = formatMarkdown(sessions, earlierTime);
+      const result = formatMarkdown(sessions, earlierTime, defaultConfig);
 
       const projectAIndex = result.indexOf("projectA");
       const projectBIndex = result.indexOf("projectB");
@@ -167,7 +218,7 @@ describe("export", () => {
     });
 
     it("returns empty string for no sessions", () => {
-      const result = formatMarkdown([], new Date("2026-01-12"));
+      const result = formatMarkdown([], new Date("2026-01-12"), defaultConfig);
       expect(result).toBe("");
     });
   });
@@ -201,6 +252,8 @@ describe("export", () => {
         filenameFormat: "yyyy-MM-dd",
         gitCommit: false,
         projectMode: "merge",
+        speakerUser: "👤",
+        speakerAssistant: "🤖",
       };
 
       await exportSessionsWithSessions(config, { date }, sessions);
@@ -241,6 +294,8 @@ describe("export", () => {
         filenameFormat: "yyyy-MM-dd",
         gitCommit: false,
         projectMode: "separate",
+        speakerUser: "👤",
+        speakerAssistant: "🤖",
       };
 
       await exportSessionsWithSessions(config, { date }, sessions);

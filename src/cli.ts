@@ -112,6 +112,8 @@ program
         filenameFormat,
         gitCommit,
         projectMode,
+        speakerUser: "👤",
+        speakerAssistant: "🤖",
       };
 
       await saveConfig(configPath, config);

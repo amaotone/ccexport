@@ -26,14 +26,14 @@ function formatDate(date: Date): string {
   return format(date, "yyyy-MM-dd");
 }
 
-export function formatSession(session: Session): string {
+export function formatSession(session: Session, config: Config): string {
   const lines: string[] = [];
 
   lines.push(`## ${formatTime(session.startTime)} ${session.projectName}`);
   lines.push("");
 
   for (const msg of session.messages) {
-    const speaker = msg.type === "user" ? "User" : "Claude";
+    const speaker = msg.type === "user" ? config.speakerUser : config.speakerAssistant;
     lines.push(`**${speaker}**: ${msg.text}`);
     lines.push("");
   }
@@ -41,7 +41,7 @@ export function formatSession(session: Session): string {
   return lines.join("\n");
 }
 
-export function formatMarkdown(sessions: Session[], date: Date): string {
+export function formatMarkdown(sessions: Session[], date: Date, config: Config): string {
   if (sessions.length === 0) {
     return "";
   }
@@ -54,7 +54,7 @@ export function formatMarkdown(sessions: Session[], date: Date): string {
   const lines: string[] = [];
 
   for (let i = 0; i < sorted.length; i++) {
-    lines.push(formatSession(sorted[i]));
+    lines.push(formatSession(sorted[i], config));
 
     if (i < sorted.length - 1) {
       lines.push("---");
@@ -209,7 +209,7 @@ export async function exportSessionsWithSessions(
       const projectDir = join(outputDir, projectName);
       await mkdir(projectDir, { recursive: true });
 
-      const markdown = formatMarkdown(projectSessions, options.date);
+      const markdown = formatMarkdown(projectSessions, options.date, config);
       if (markdown && !options.dryRun) {
         await writeFile(join(projectDir, filename), markdown);
       }
@@ -219,7 +219,7 @@ export async function exportSessionsWithSessions(
   }
 
   // merge mode (default)
-  const markdown = formatMarkdown(sessions, options.date);
+  const markdown = formatMarkdown(sessions, options.date, config);
 
   if (options.dryRun || !markdown) {
     return markdown;
